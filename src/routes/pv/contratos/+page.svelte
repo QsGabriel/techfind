@@ -26,13 +26,19 @@
 		<Dialog.Portal>
 			<Dialog.Overlay class="fixed inset-0 z-50 bg-black/80" />
 			<Dialog.Content
-				class="bg-principal-1 fixed top-[50%] left-[50%] z-50 w-2/3 translate-x-[-50%] translate-y-[-50%] rounded-lg border p-5 shadow-sm outline-hidden"
+				class="bg-principal-1 fixed top-[50%] left-[50%] z-50 flex w-full max-w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] translate-x-[-50%] translate-y-[-50%] flex-col rounded-lg border shadow-sm outline-hidden sm:max-w-2xl"
 			>
-				<Dialog.Title
-					class="flex w-full items-center justify-center text-2xl font-bold tracking-tight "
-				>
-					Criação de Contrato
-				</Dialog.Title>
+				<div class="flex items-center justify-center border-b p-5">
+					<Dialog.Title class="text-2xl font-bold tracking-tight">
+						Criação de Contrato
+					</Dialog.Title>
+					<Dialog.Close
+						class="focus-visible:ring-foreground focus-visible:ring-offset-background absolute top-5 right-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
+					>
+						<X class="hover:text-principal-4 size-6 text-black" />
+					</Dialog.Close>
+				</div>
+				<div class="overflow-y-auto p-5">
 				<ScrollArea.Root class="overflow-hidden">
 					<ScrollArea.Viewport class="h-full max-h-[50rem]">
 						<Contract />
@@ -51,11 +57,7 @@
 					</ScrollArea.Scrollbar>
 					<ScrollArea.Corner />
 				</ScrollArea.Root>
-				<Dialog.Close
-					class="focus-visible:ring-foreground focus-visible:ring-offset-background absolute top-5 right-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
-				>
-					<X class="hover:text-principal-4 size-6 text-black" />
-				</Dialog.Close>
+				</div>
 			</Dialog.Content>
 		</Dialog.Portal>
 	</Dialog.Root>
@@ -77,13 +79,19 @@
 				<Dialog.Portal>
 					<Dialog.Overlay class="fixed inset-0 z-50 bg-black/80" />
 					<Dialog.Content
-						class="bg-principal-1 fixed top-[50%] left-[50%] z-50 w-2/3 translate-x-[-50%] translate-y-[-50%] rounded-lg border p-5 shadow-sm outline-hidden"
+						class="bg-principal-1 fixed top-[50%] left-[50%] z-50 flex w-full max-w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] translate-x-[-50%] translate-y-[-50%] flex-col rounded-lg border shadow-sm outline-hidden sm:max-w-2xl"
 					>
-						<Dialog.Title
-							class="flex w-full items-center justify-center text-2xl font-bold tracking-tight "
-						>
-							Informações sobre o contrato
-						</Dialog.Title>
+						<div class="flex items-center justify-center border-b p-5">
+							<Dialog.Title class="text-2xl font-bold tracking-tight">
+								Informações sobre o contrato
+							</Dialog.Title>
+							<Dialog.Close
+								class="focus-visible:ring-foreground focus-visible:ring-offset-background absolute top-5 right-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
+							>
+								<X class="hover:text-principal-4 size-6 text-black" />
+							</Dialog.Close>
+						</div>
+						<div class="overflow-y-auto p-5">
 						<ScrollArea.Root class="overflow-hidden">
 							<ScrollArea.Viewport class="h-full max-h-[50rem]">
 								<Contract {contract} />
@@ -102,11 +110,7 @@
 							</ScrollArea.Scrollbar>
 							<ScrollArea.Corner />
 						</ScrollArea.Root>
-						<Dialog.Close
-							class="focus-visible:ring-foreground focus-visible:ring-offset-background absolute top-5 right-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
-						>
-							<X class="hover:text-principal-4 size-6 text-black" />
-						</Dialog.Close>
+						</div>
 					</Dialog.Content>
 				</Dialog.Portal>
 			</Dialog.Root>
