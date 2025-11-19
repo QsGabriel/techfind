@@ -64,8 +64,8 @@ body {
 /* Tema Escuro */
 [data-theme='dark'] {
 	--bg-color: #1f2937;
-	--text-color: #f9fafb;
-	--text-secondary: #d1d5db;
+	--text-color: #ffffff;
+	--text-secondary: #e5e7eb;
 	--border-color: #374151;
 	--hover-bg: rgba(255, 255, 255, 0.1);
 	--header-bg: rgba(79, 70, 229, 0.2);
@@ -77,7 +77,20 @@ body {
 
 [data-theme='dark'] body {
 	background-color: #111827;
-	color: var(--text-color);
+	color: #ffffff;
+}
+
+/* Forçar texto branco em elementos de texto em modo escuro */
+[data-theme='dark'] h1:not(.bg-principal-5):not(.bg-white),
+[data-theme='dark'] h2:not(.bg-principal-5):not(.bg-white),
+[data-theme='dark'] h3:not(.bg-principal-5):not(.bg-white),
+[data-theme='dark'] h4:not(.bg-principal-5):not(.bg-white),
+[data-theme='dark'] h5:not(.bg-principal-5):not(.bg-white),
+[data-theme='dark'] h6:not(.bg-principal-5):not(.bg-white),
+[data-theme='dark'] p:not(.bg-principal-5):not(.bg-white),
+[data-theme='dark'] span:not(.bg-principal-5):not(.bg-white),
+[data-theme='dark'] li:not(.bg-principal-5):not(.bg-white) {
+	color: #ffffff;
 }
 
 /* Alto Contraste */
@@ -155,6 +168,19 @@ body {
 button,
 a {
 	color: inherit;
+}
+
+/* Exceções para botões específicos que devem ter texto preto sempre */
+[data-theme='dark'] a.bg-principal-5,
+[data-theme='dark'] a.bg-white,
+[data-theme='dark'] button.bg-principal-5,
+[data-theme='dark'] button.bg-white {
+	color: #1f2937 !important;
+}
+
+/* Garantir que textos com !text-gray-900 sejam respeitados */
+[data-theme='dark'] .\!text-gray-900 {
+	color: #1f2937 !important;
 }
 
 /* Removido: sobreescritas de tamanho de heading - deixar Tailwind gerenciar */

@@ -38,9 +38,9 @@
 		</p>
 
 		<div class="flex gap-6">
-			<a href="#aboutus" class={`${btn} bg-principal-5 text-gray-900`}>Saiba mais</a>
+			<a href="#aboutus" class={`${btn} bg-principal-5 !text-gray-900`}>Saiba mais</a>
 
-			<a href="tel:+5561984975160" class={`${btn} gap-3 bg-white text-gray-900`}>
+			<a href="tel:+5561984975160" class={`${btn} gap-3 bg-white !text-gray-900`}>
 				<svg
 					class="bg-principal-3 size-8 rounded-xl p-2"
 					xmlns="http://www.w3.org/2000/svg"
