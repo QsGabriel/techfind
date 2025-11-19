@@ -184,6 +184,11 @@ a {
 }
 
 /* Header, Footer e Menu Mobile em modo escuro */
+header a,
+header span {
+	color: #1f2937;
+}
+
 [data-theme='dark'] header {
 	background-color: #1f2937 !important;
 	border-bottom: 1px solid #374151;
