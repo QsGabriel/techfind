@@ -7,6 +7,8 @@
 
 	const socialIcons =
 		'flex items-center justify-center size-12 bg-white p-1 rounded-xl shadow-sm pointer hover:shadow-principal-4 transition-all duration-150 ease-in';
+	const actionIcons =
+		'flex items-center justify-center size-12 bg-white rounded-xl shadow-sm pointer hover:shadow-principal-4 transition-all duration-150 ease-in';
 	const socials = [
 		{
 			href: 'https://chat.whatsapp.com/LkR6fPlgtcuEvHk5x2A5r3',
@@ -33,23 +35,47 @@
 	}
 </script>
 
-<footer class="relative flex min-h-32 flex-col">
-	<div class="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-6 md:px-12">
+<footer class="relative flex min-h-24 flex-col">
+	<div class="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-4 md:px-12">
 		<div class="flex items-center gap-4">
 			<Copyright size={20} />
-			<span class="font-medium text-black"> 2024 TechFind </span>
+			<span class="font-medium"> 2025 TechFind </span>
 		</div>
 
 		<div class="flex items-center justify-around gap-5">
+			<!-- Botão de Acessibilidade -->
+			<button
+				type="button"
+				onclick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+				class={actionIcons}
+				aria-label="Controles de Acessibilidade"
+				title="Controles de Acessibilidade (Rolar para o topo)"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-6 w-6"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<circle cx="12" cy="12" r="10"></circle>
+					<path d="M12 16v-4"></path>
+					<path d="m8 10 4-4 4 4"></path>
+				</svg>
+			</button>
+
 			<!-- Botão de Ajuda -->
 			<button
 				type="button"
 				onclick={toggleHelpCenter}
-				class={socialIcons}
+				class={actionIcons}
 				aria-label="Central de Ajuda"
 				title="Central de Ajuda"
 			>
-				<HelpCircle class="h-8 w-8 text-principal-4" />
+				<HelpCircle class="h-6 w-6" />
 			</button>
 
 			<!-- Redes Sociais -->
@@ -110,5 +136,10 @@
 <style>
 	footer {
 		background: linear-gradient(0deg, rgb(230, 230, 230) 10%, rgba(255, 233, 180, 0) 100%);
+	}
+
+	:global([data-theme='dark']) footer {
+		background: transparent !important;
+		border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
 	}
 </style>

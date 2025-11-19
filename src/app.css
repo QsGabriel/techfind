@@ -183,6 +183,105 @@ a {
 	color: #1f2937 !important;
 }
 
+/* Header, Footer e Menu Mobile em modo escuro */
+[data-theme='dark'] header {
+	background-color: #1f2937 !important;
+	border-bottom: 1px solid #374151;
+}
+
+[data-theme='dark'] header a,
+[data-theme='dark'] header span {
+	color: #ffffff !important;
+}
+
+[data-theme='dark'] header svg {
+	stroke: #ffffff;
+	color: #ffffff;
+}
+
+/* Footer em modo escuro - apenas texto branco */
+[data-theme='dark'] footer span {
+	color: #ffffff !important;
+}
+
+[data-theme='dark'] footer .lucide {
+	color: #ffffff !important;
+	stroke: #ffffff !important;
+}
+
+/* Ícones do footer - padronizar cor */
+[data-theme='dark'] footer path {
+	fill: #1f2937;
+}
+
+/* Manter ícones sociais com fundo branco em modo escuro */
+[data-theme='dark'] footer a[aria-label='social icon'] {
+	background-color: #ffffff !important;
+}
+
+[data-theme='dark'] footer a[aria-label='social icon'] svg,
+[data-theme='dark'] footer a[aria-label='social icon'] path {
+	fill: #1f2937 !important;
+}
+
+/* Botão de ajuda com fundo branco */
+[data-theme='dark'] footer button[aria-label='Central de Ajuda'] {
+	background-color: #ffffff !important;
+}
+
+[data-theme='dark'] footer button[aria-label='Central de Ajuda'] .lucide {
+	color: #1f2937 !important;
+	stroke: #1f2937 !important;
+}
+
+/* Botão de acessibilidade no footer com fundo branco */
+[data-theme='dark'] footer button[aria-label='Controles de Acessibilidade'] {
+	background-color: #ffffff !important;
+}
+
+[data-theme='dark'] footer button[aria-label='Controles de Acessibilidade'] svg {
+	color: #1f2937 !important;
+	stroke: #1f2937 !important;
+}
+
+/* Modais de Login e Cadastro em modo escuro */
+[data-theme='dark'] [role='dialog'] {
+	background-color: #1f2937 !important;
+	border-color: #374151 !important;
+}
+
+[data-theme='dark'] [role='dialog'] h2,
+[data-theme='dark'] [role='dialog'] label,
+[data-theme='dark'] [role='dialog'] span,
+[data-theme='dark'] [role='dialog'] p {
+	color: #ffffff !important;
+}
+
+[data-theme='dark'] [role='dialog'] input,
+[data-theme='dark'] [role='dialog'] select {
+	background-color: #374151 !important;
+	color: #ffffff !important;
+	border-color: #4b5563 !important;
+}
+
+[data-theme='dark'] [role='dialog'] input::placeholder {
+	color: #9ca3af !important;
+}
+
+/* Manter cards de planos brancos em modo escuro */
+[data-theme='dark'] #planos > div > div {
+	background-color: #ffffff !important;
+}
+
+[data-theme='dark'] #planos > div > div * {
+	color: #1f2937 !important;
+}
+
+[data-theme='dark'] #planos h2,
+[data-theme='dark'] #planos h3 {
+	color: #ffffff !important;
+}
+
 /* Removido: sobreescritas de tamanho de heading - deixar Tailwind gerenciar */
 
 small,

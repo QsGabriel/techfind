@@ -17,12 +17,14 @@
 		Minus,
 		RotateCcw
 	} from '@lucide/svelte';
-	import { fly, fade } from 'svelte/transition';
+	import { fly, fade, scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
+	import { onMount } from 'svelte';
 
 	// Estado do painel
 	let isOpen = $state(false);
 	let isExpanded = $state(false);
+	let isVisible = $state(true);
 
 	// Stores reativas
 	let currentTheme = $state($theme);
@@ -45,6 +47,29 @@
 
 	$effect(() => {
 		currentEffectiveTheme = $effectiveTheme;
+	});
+
+	// Controle de visibilidade baseado no scroll
+	onMount(() => {
+		const handleScroll = () => {
+			const scrollPosition = window.scrollY;
+			const windowHeight = window.innerHeight;
+			const documentHeight = document.documentElement.scrollHeight;
+			
+			// Oculta o botão quando estiver próximo do footer (últimos 300px)
+			const isNearFooter = scrollPosition + windowHeight >= documentHeight - 300;
+			
+			isVisible = !isNearFooter;
+		};
+
+		window.addEventListener('scroll', handleScroll);
+		window.addEventListener('resize', handleScroll);
+		handleScroll(); // Verifica a posição inicial
+
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+			window.removeEventListener('resize', handleScroll);
+		};
 	});
 
 	// Funções de controle
@@ -77,17 +102,18 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <!-- Botão Flutuante Principal -->
-<div class="accessibility-widget">
-	<button
-		class="accessibility-trigger"
-		onclick={togglePanel}
-		aria-label="Abrir controles de acessibilidade"
-		aria-expanded={isOpen}
-		aria-controls="accessibility-panel"
-		title="Controles de Acessibilidade (Ctrl+Shift+A)"
-	>
-		<Settings class="icon" />
-		<span class="sr-only">Acessibilidade</span>
+{#if isVisible}
+	<div class="accessibility-widget" transition:scale={{ duration: 300 }}>
+		<button
+			class="accessibility-trigger"
+			onclick={togglePanel}
+			aria-label="Abrir controles de acessibilidade"
+			aria-expanded={isOpen}
+			aria-controls="accessibility-panel"
+			title="Controles de Acessibilidade (Ctrl+Shift+A)"
+		>
+			<Settings class="icon" />
+			<span class="sr-only">Acessibilidade</span>
 	</button>
 
 	<!-- Painel de Controles -->
@@ -252,7 +278,8 @@
 			transition:fade={{ duration: 200 }}
 		></button>
 	{/if}
-</div>
+	</div>
+{/if}
 
 <style>
 	/* ============================================
