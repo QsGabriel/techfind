@@ -6,7 +6,8 @@ const config = {
 
 	kit: {
 		alias: {
-			$img: 'src/lib/images'
+			$img: 'src/lib/images',
+			$stores: 'src/stores'
 		},
 		adapter: adapter()
 	}
