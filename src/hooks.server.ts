@@ -67,13 +67,14 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	event.locals.session = session;
 	event.locals.user = user;
 
-	if (!event.locals.session && event.url.pathname.startsWith('/pv')) {
-		redirect(303, '/');
-	}
+	// Proteções desativadas para testes
+	// if (!event.locals.session && event.url.pathname.startsWith('/pv')) {
+	// 	redirect(303, '/');
+	// }
 
-	if (event.locals.session && event.url.pathname === '/') {
-		redirect(303, '/pv');
-	}
+	// if (event.locals.session && event.url.pathname === '/') {
+	// 	redirect(303, '/pv');
+	// }
 
 	return resolve(event);
 };

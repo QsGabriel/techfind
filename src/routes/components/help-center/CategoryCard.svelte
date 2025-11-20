@@ -37,8 +37,8 @@
 	type="button"
 	onclick={onClick}
 	class="group relative flex w-full flex-col items-center gap-3 rounded-xl border-2 p-6 transition-all duration-300 {isActive
-		? 'border-principal-4 bg-principal-4/5 shadow-lg shadow-principal-4/20'
-		: 'border-gray-200 bg-white hover:border-principal-4/50 hover:shadow-md'}"
+		? 'border-principal-4 bg-principal-4/5 dark:bg-principal-4/10 shadow-lg shadow-principal-4/20'
+		: 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-principal-4/50 hover:shadow-md'}"
 	aria-pressed={isActive}
 	transition:scale={{ duration: 200 }}
 >
@@ -53,13 +53,13 @@
 	<div class="text-center">
 		<h3
 			class="text-lg font-bold transition-colors duration-300 {isActive
-				? 'text-principal-6'
-				: 'text-gray-800 group-hover:text-principal-5'}"
+				? 'text-principal-6 dark:text-principal-3'
+				: 'text-gray-800 dark:text-gray-100 group-hover:text-principal-5'}"
 		>
 			{category.title}
 		</h3>
 		{#if category.description}
-			<p class="mt-1 text-sm font-medium text-gray-500">{category.description}</p>
+			<p class="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">{category.description}</p>
 		{/if}
 	</div>
 

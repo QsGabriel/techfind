@@ -2,10 +2,13 @@
 	import { HelpCircle, X } from '@lucide/svelte';
 	import { fade, scale } from 'svelte/transition';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import HelpCenter from './help-center/HelpCenter.svelte';
 
 	let showHelpCenter = $state(false);
 	let isVisible = $state(false);
+	
+	let profile = $derived($page.data.profile);
 
 	onMount(() => {
 		const handleScroll = () => {
@@ -81,18 +84,22 @@
 		tabindex="-1"
 	>
 		<div
-			class="relative max-h-[90vh] w-full max-w-7xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+			class="relative max-h-[90vh] w-full max-w-7xl overflow-y-auto rounded-2xl bg-white dark:bg-gray-800 shadow-2xl"
 			transition:fade={{ duration: 300, delay: 100 }}
 		>
 			<button
 				type="button"
 				onclick={toggleHelpCenter}
-				class="hover:bg-principal-4 sticky right-4 top-4 z-10 ml-auto mr-4 mt-4 flex rounded-full bg-gray-100 p-2 text-gray-600 transition-all duration-200 hover:text-white"
+				class="hover:bg-principal-4 sticky right-4 top-4 z-10 ml-auto mr-4 mt-4 flex rounded-full bg-gray-100 dark:bg-gray-700 p-2 text-gray-600 dark:text-gray-300 transition-all duration-200 hover:text-white"
 				aria-label="Fechar Central de Ajuda"
 			>
 				<X size={24} />
 			</button>
-			<HelpCenter />
+			<HelpCenter 
+				onClose={toggleHelpCenter} 
+				userEmail={profile?.email || ''} 
+				userName={profile?.name || ''} 
+			/>
 		</div>
 	</div>
 {/if}

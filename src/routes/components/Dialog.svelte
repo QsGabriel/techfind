@@ -1,12 +1,24 @@
 <script lang="ts">
 	import { Dialog, Meter, Label, RadioGroup } from 'bits-ui';
-	import { X } from '@lucide/svelte';
+	import { X, Eye, EyeOff, CheckCircle2, AlertCircle } from '@lucide/svelte';
 	import { page } from '$app/stores';
 	import { superForm } from 'sveltekit-superforms';
-	import { fly } from 'svelte/transition';
+	import { fly, scale } from 'svelte/transition';
 	import Loading from './Loading.svelte';
 
-	const { errors: signupErrors, enhance: signupEnhance } = superForm($page.data.formSignup);
+	const {
+		errors: signupErrors,
+		enhance: signupEnhance,
+		delayed: delayedSignup
+	} = superForm($page.data.formSignup, {
+		delayMs: 0,
+		timeoutMs: 0,
+		onResult: async ({ result }) => {
+			if (result.type === 'success') {
+				window.location.href = window.location.href;
+			}
+		}
+	});
 	const {
 		errors: loginErrors,
 		enhance: loginEnhance,
@@ -21,7 +33,23 @@
 		}
 	});
 
+	// Reset password form
+	const {
+		errors: resetErrors,
+		enhance: resetEnhance,
+		delayed: delayedReset,
+		message: resetMessage
+	} = superForm($page.data.formResetPassword, {
+		delayMs: 0,
+		timeoutMs: 0,
+		resetForm: true
+	});
+
 	let isClient = $state('Cliente');
+	let showLoginPassword = $state(false);
+	let showSignupPassword = $state(false);
+	let showForgotPassword = $state(false);
+	let resetSuccess = $state(false);
 	let dateToday = new Date().toISOString().split('T')[0].split('-');
 	dateToday[0] = String(Number(dateToday[0]) - 18);
 	// let placeholdCPF = $derived(isCPF === 'CPF' ? '000.000.000-00' : '00.000.000/0000-00');
@@ -61,107 +89,299 @@
 		if (password.length >= 15) return 1;
 		return sum;
 	}
+
+	// Input masks
+	function maskPhone(value: string) {
+		return value
+			.replace(/\D/g, '')
+			.replace(/^(\d{2})(\d)/g, '($1) $2')
+			.replace(/(\d)(\d{4})$/, '$1-$2')
+			.slice(0, 15);
+	}
+
+	function maskCPFCNPJ(value: string) {
+		const numbers = value.replace(/\D/g, '');
+		if (numbers.length <= 11) {
+			return numbers
+				.replace(/(\d{3})(\d)/, '$1.$2')
+				.replace(/(\d{3})(\d)/, '$1.$2')
+				.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+		}
+		return numbers
+			.replace(/(\d{2})(\d)/, '$1.$2')
+			.replace(/(\d{3})(\d)/, '$1.$2')
+			.replace(/(\d{3})(\d)/, '$1/$2')
+			.replace(/(\d{4})(\d{1,2})$/, '$1-$2')
+			.slice(0, 18);
+	}
+
+	function handlePhoneInput(e: Event) {
+		const input = e.target as HTMLInputElement;
+		input.value = maskPhone(input.value);
+	}
+
+	function handleCPFCNPJInput(e: Event) {
+		const input = e.target as HTMLInputElement;
+		input.value = maskCPFCNPJ(input.value);
+	}
+
+	$effect(() => {
+		if ($resetMessage?.success) {
+			resetSuccess = true;
+			setTimeout(() => {
+				showForgotPassword = false;
+				resetSuccess = false;
+			}, 3000);
+		}
+	});
 </script>
 
 {#snippet login()}
-	<form method="POST" action="?/login" use:loginEnhance>
-		<div class="flex flex-col items-start gap-1 py-4">
-			<Label.Root for="email" class="text-sm font-medium">Email:</Label.Root>
-			<div class="w-full">
-				<input
-					type="email"
-					name="email"
-					aria-invalid={$loginErrors.email ? 'true' : undefined}
-					class="bg-principal-1 line inline-flex h-10 w-full items-center rounded-sm border border-zinc-300 px-4 text-base focus:ring-2 focus:ring-offset-2 focus:outline-hidden sm:text-sm"
-				/>
-			</div>
-			{#if $loginErrors.email}<span class="mt-1 pl-2 font-bold text-red-500"
-					>{$loginErrors.email}</span
-				>{/if}
-		</div>
-		<div class="mb-8 flex flex-col items-start gap-1 py-4">
-			<Label.Root for="password" class="text-sm font-medium">Senha:</Label.Root>
-			<div class="w-full">
-				<input
-					type="password"
-					name="password"
-					aria-invalid={$loginErrors.password ? 'true' : undefined}
-					class="bg-principal-1 inline-flex h-10 w-full items-center rounded-sm border border-zinc-300 px-4 text-base focus:ring-2 focus:ring-offset-2 focus:outline-hidden sm:text-sm"
-				/>
-			</div>
-			{#if $loginErrors.password}<span class="mt-1 pl-2 font-bold text-red-500"
-					>{$loginErrors.password}</span
-				>{/if}
-		</div>
-		<div class="flex w-full flex-col items-center gap-2">
-			<button
-				class="bg-principal-5 hover:bg-principal-3 mb-4 inline-flex h-10 w-2/3 items-center justify-center rounded-lg px-12 py-6 font-semibold text-black shadow-sm transition-colors duration-300 active:scale-[0.95]"
-			>
-				{#if $delayed}
-					<Loading />
-				{:else}
-					Entrar
+	{#if !showForgotPassword}
+		<form method="POST" action="?/login" use:loginEnhance>
+			<div class="flex flex-col items-start gap-2 py-3">
+				<Label.Root for="email-login" class="text-sm font-medium text-gray-700 dark:text-gray-200">
+					Email
+				</Label.Root>
+				<div class="w-full">
+					<input
+						id="email-login"
+						type="email"
+						name="email"
+						placeholder="seu@email.com"
+						aria-invalid={$loginErrors.email ? 'true' : undefined}
+						class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-principal-5 focus:ring-2 focus:ring-principal-5/20 focus:outline-none transition-colors"
+					/>
+				</div>
+				{#if $loginErrors.email}
+					<span class="flex items-center gap-1 text-sm font-medium text-red-500" transition:fly={{ y: -10 }}>
+						<AlertCircle class="size-4" />
+						{$loginErrors.email}
+					</span>
 				{/if}
-			</button>
-			{#if $loginErrors._errors && !($loginErrors.password || $loginErrors.email)}
-				<span class="font-bold text-red-500" in:fly={{ x: 200, duration: 1000 }}>
-					{$loginErrors._errors}
-				</span>
+			</div>
+			
+			<div class="flex flex-col items-start gap-2 py-3">
+				<Label.Root for="password-login" class="text-sm font-medium text-gray-700 dark:text-gray-200">
+					Senha
+				</Label.Root>
+				<div class="relative w-full">
+					<input
+						id="password-login"
+						type={showLoginPassword ? 'text' : 'password'}
+						name="password"
+						placeholder="••••••••"
+						aria-invalid={$loginErrors.password ? 'true' : undefined}
+						class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 pr-10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-principal-5 focus:ring-2 focus:ring-principal-5/20 focus:outline-none transition-colors"
+					/>
+					<button
+						type="button"
+						onclick={() => (showLoginPassword = !showLoginPassword)}
+						class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+					>
+						{#if showLoginPassword}
+							<EyeOff class="size-5" />
+						{:else}
+							<Eye class="size-5" />
+						{/if}
+					</button>
+				</div>
+				{#if $loginErrors.password}
+					<span class="flex items-center gap-1 text-sm font-medium text-red-500" transition:fly={{ y: -10 }}>
+						<AlertCircle class="size-4" />
+						{$loginErrors.password}
+					</span>
+				{/if}
+			</div>
+
+			<div class="flex justify-end py-2">
+				<button
+					type="button"
+					onclick={() => (showForgotPassword = true)}
+					class="text-sm font-medium text-principal-6 hover:text-principal-5 transition-colors"
+				>
+					Esqueceu sua senha?
+				</button>
+			</div>
+			
+			<div class="flex flex-col items-center gap-3 pt-4">
+				<button
+					type="submit"
+					class="w-full bg-principal-5 hover:bg-principal-6 rounded-lg px-6 py-3 font-semibold text-white shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+					disabled={$delayed}
+				>
+					{#if $delayed}
+						<Loading />
+					{:else}
+						Entrar
+					{/if}
+				</button>
+				
+				{#if $loginErrors._errors && !($loginErrors.password || $loginErrors.email)}
+					<div class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg w-full" transition:scale>
+						<AlertCircle class="size-5 text-red-500" />
+						<span class="text-sm font-medium text-red-700 dark:text-red-300">
+							{$loginErrors._errors}
+						</span>
+					</div>
+				{/if}
+			</div>
+		</form>
+	{:else}
+		<!-- Forgot Password Form -->
+		<div class="space-y-4" transition:fly={{ x: 200, duration: 300 }}>
+			{#if resetSuccess}
+				<div class="flex flex-col items-center justify-center py-8 gap-4" transition:scale>
+					<CheckCircle2 class="size-16 text-green-500" />
+					<h3 class="text-xl font-bold text-gray-900 dark:text-white">Email Enviado!</h3>
+					<p class="text-center text-gray-600 dark:text-gray-400">
+						Verifique sua caixa de entrada para redefinir sua senha.
+					</p>
+				</div>
+			{:else}
+				<div class="space-y-2">
+					<button
+						type="button"
+						onclick={() => (showForgotPassword = false)}
+						class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+					>
+						← Voltar ao login
+					</button>
+					<h3 class="text-xl font-bold text-gray-900 dark:text-white">Recuperar Senha</h3>
+					<p class="text-sm text-gray-600 dark:text-gray-400">
+						Digite seu email e enviaremos um link para redefinir sua senha.
+					</p>
+				</div>
+
+				<form method="POST" action="?/resetPassword" use:resetEnhance>
+					<div class="flex flex-col items-start gap-2 py-3">
+						<Label.Root for="email-reset" class="text-sm font-medium text-gray-700 dark:text-gray-200">
+							Email
+						</Label.Root>
+						<div class="w-full">
+							<input
+								id="email-reset"
+								type="email"
+								name="email"
+								placeholder="seu@email.com"
+								aria-invalid={$resetErrors.email ? 'true' : undefined}
+								class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-principal-5 focus:ring-2 focus:ring-principal-5/20 focus:outline-none transition-colors"
+							/>
+						</div>
+						{#if $resetErrors.email}
+							<span class="flex items-center gap-1 text-sm font-medium text-red-500" transition:fly={{ y: -10 }}>
+								<AlertCircle class="size-4" />
+								{$resetErrors.email}
+							</span>
+						{/if}
+					</div>
+
+					<button
+						type="submit"
+						class="w-full bg-principal-5 hover:bg-principal-6 rounded-lg px-6 py-3 font-semibold text-white shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+						disabled={$delayedReset}
+					>
+						{#if $delayedReset}
+							<Loading />
+						{:else}
+							Enviar Link de Recuperação
+						{/if}
+					</button>
+
+					{#if $resetErrors._errors}
+						<div class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg w-full mt-4" transition:scale>
+							<AlertCircle class="size-5 text-red-500" />
+							<span class="text-sm font-medium text-red-700 dark:text-red-300">
+								{$resetErrors._errors}
+							</span>
+						</div>
+					{/if}
+				</form>
 			{/if}
 		</div>
-	</form>
+	{/if}
 {/snippet}
 
 {#snippet cadastro()}
 	<form method="POST" action="?/signup" use:signupEnhance>
-		<div class="flex flex-col items-center gap-2 py-4">
-			<Label.Root for="client" class="w-1/2 text-sm font-medium text-black"
-				><RadioGroup.Root
-					name="radio"
-					bind:value={isClient}
-					class="flex flex-1 flex-wrap justify-between gap-4 text-sm font-medium"
-				>
-					{#each ['Cliente', 'Prestador'] as itens (itens)}
-						<div class="flex items-center gap-4">
-							<RadioGroup.Item
-								id={itens}
-								value={itens}
-								class="data-[state=checked]:border-principal-3 size-6 shrink-0 cursor-default rounded-full border-2 border-black transition-all duration-100 ease-in-out hover:border-black/40 data-[state=checked]:border-6"
-							></RadioGroup.Item><Label.Root for={itens} class="">{itens}</Label.Root>
-						</div>
-					{/each}
-				</RadioGroup.Root></Label.Root
+		<div class="flex flex-col items-start gap-3 py-4">
+			<Label.Root for="client" class="text-sm font-medium text-gray-900 dark:text-white">Tipo de conta:</Label.Root>
+			<RadioGroup.Root
+				name="radio"
+				bind:value={isClient}
+				class="flex w-full items-center gap-3"
 			>
+			{#each ['Cliente', 'Prestador'] as itens (itens)}
+				<label 
+					for={itens}
+					class="relative flex items-center gap-3 px-5 py-3.5 rounded-xl border-2 transition-all cursor-pointer flex-1 overflow-hidden
+						{isClient === itens 
+							? 'border-principal-5 bg-principal-5/5 dark:bg-principal-5/10 shadow-lg' 
+							: 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-principal-4 hover:bg-gray-50 dark:hover:bg-gray-700/50'}"
+				>
+					{#if isClient === itens}
+						<div class="absolute inset-0 rounded-xl">
+							<div class="absolute inset-0 rounded-xl border-glow"></div>
+						</div>
+					{/if}
+					<RadioGroup.Item
+						id={itens}
+						value={itens}
+						class="relative h-5 w-5 rounded-full border-2 flex-shrink-0 transition-all flex items-center justify-center z-10
+							{isClient === itens 
+								? 'border-principal-5 bg-principal-5' 
+								: 'border-gray-400 dark:border-gray-500 bg-white dark:bg-gray-800'}"
+					>
+						<div 
+							class="h-2.5 w-2.5 rounded-full bg-white transition-transform duration-200
+								{isClient === itens ? 'scale-100' : 'scale-0'}"
+						></div>
+					</RadioGroup.Item>
+					<span class="text-sm font-semibold relative z-10 transition-colors
+						{isClient === itens 
+							? 'text-principal-6 dark:text-principal-4' 
+							: 'text-gray-700 dark:text-gray-300'}"
+					>
+						{itens}
+					</span>
+				</label>
+			{/each}
+			</RadioGroup.Root>
 		</div>
 		<div class="flex flex-col items-start gap-1 py-4">
 			<Label.Root for="name" class="text-sm font-medium">Nome Completo:</Label.Root>
 			<div class="w-full">
 				<input
+					id="name"
 					type="text"
 					name="name"
-					class="bg-principal-1 placeholder:text-foreground-alt/50 inline-flex h-10 w-full items-center rounded-sm border border-zinc-300 px-4 text-base focus:ring-2 focus:ring-offset-2 focus:outline-hidden sm:text-sm"
+					placeholder="Seu nome completo"
+					class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-principal-5 focus:ring-2 focus:ring-principal-5/20 focus:outline-none transition-colors"
 				/>
 			</div>
-			{#if $signupErrors.name}<span class="mt-1 pl-2 text-sm font-bold text-red-500"
-					>{$signupErrors.name}</span
+			{#if $signupErrors.name}<span class="flex items-center gap-1 text-sm font-medium text-red-500" transition:fly={{ y: -10 }}>
+					<AlertCircle class="size-4" />
+					{$signupErrors.name}</span
 				>{/if}
 		</div>
 		<div class="flex flex-col items-start gap-1 py-4">
-			<Label.Root for="date" class="text-sm font-medium"
-				>Data de nascimento / abertura da empresa:</Label.Root
-			>
+			<Label.Root for="date" class="text-sm font-medium">
+				{isClient === 'Cliente' ? 'Data de Nascimento' : 'Data de Abertura da Empresa'}
+			</Label.Root>
 			<div class="w-full">
 				<input
+					id="date"
 					type="date"
 					max={isClient === 'Cliente'
 						? dateToday.join('-')
 						: new Date().toISOString().split('T')[0]}
 					name="date"
-					class="bg-principal-1 placeholder:text-foreground-alt/50 inline-flex h-10 w-full items-center rounded-sm border border-zinc-300 px-4 text-base focus:ring-2 focus:ring-offset-2 focus:outline-hidden sm:text-sm"
+					class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white focus:border-principal-5 focus:ring-2 focus:ring-principal-5/20 focus:outline-none transition-colors"
 				/>
 			</div>
-			{#if $signupErrors.date}<span class="mt-1 pl-2 text-sm font-bold text-red-500"
-					>{$signupErrors.date}</span
+			{#if $signupErrors.date}<span class="flex items-center gap-1 text-sm font-medium text-red-500" transition:fly={{ y: -10 }}>
+					<AlertCircle class="size-4" />
+					{$signupErrors.date}</span
 				>{/if}
 		</div>
 
@@ -169,83 +389,126 @@
 			<Label.Root for="typePersonal" class="text-sm font-medium">CPF / CNPJ:</Label.Root>
 			<div class="w-full">
 				<input
+					id="typePersonal"
 					type="text"
-					placeholder="0000000000"
+					placeholder={isClient === 'Cliente' ? '000.000.000-00' : '00.000.000/0000-00'}
 					name="typePersonal"
-					class="bg-principal-1 placeholder:text-foreground-alt/50 inline-flex h-10 w-full items-center rounded-sm border border-zinc-300 px-4 text-base focus:ring-2 focus:ring-offset-2 focus:outline-hidden sm:text-sm"
+					oninput={handleCPFCNPJInput}
+					class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-principal-5 focus:ring-2 focus:ring-principal-5/20 focus:outline-none transition-colors"
 				/>
 			</div>
 
-			{#if $signupErrors.typePersonal}<span class="mt-1 pl-2 text-sm font-bold text-red-500"
-					>{$signupErrors.typePersonal}</span
+			{#if $signupErrors.typePersonal}<span class="flex items-center gap-1 text-sm font-medium text-red-500" transition:fly={{ y: -10 }}>
+					<AlertCircle class="size-4" />
+					{$signupErrors.typePersonal}</span
 				>{/if}
 		</div>
 		<div class="flex flex-col items-start gap-1 py-4">
 			<Label.Root for="phone" class="text-sm font-medium">Telefone:</Label.Root>
 			<div class="w-full">
 				<input
+					id="phone"
 					type="text"
 					name="phone"
-					placeholder="(00)00000-0000"
-					class="bg-principal-1 placeholder:text-foreground-alt/50 inline-flex h-10 w-full items-center rounded-sm border border-zinc-300 px-4 text-base focus:ring-2 focus:ring-offset-2 focus:outline-hidden sm:text-sm"
+					placeholder="(11) 99999-9999"
+					oninput={handlePhoneInput}
+					class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-principal-5 focus:ring-2 focus:ring-principal-5/20 focus:outline-none transition-colors"
 				/>
 			</div>
 
-			{#if $signupErrors.phone}<span class="mt-1 pl-2 text-sm font-bold text-red-500"
-					>{$signupErrors.phone}</span
+			{#if $signupErrors.phone}<span class="flex items-center gap-1 text-sm font-medium text-red-500" transition:fly={{ y: -10 }}>
+					<AlertCircle class="size-4" />
+					{$signupErrors.phone}</span
 				>{/if}
 		</div>
 		<div class="flex flex-col items-start gap-1 py-4">
 			<Label.Root for="email" class="text-sm font-medium">Email:</Label.Root>
 			<div class="w-full">
 				<input
+					id="email"
 					type="email"
 					name="email"
-					class="bg-principal-1 placeholder:text-foreground-alt/50 inline-flex h-10 w-full items-center rounded-sm border border-zinc-300 px-4 text-base focus:ring-2 focus:ring-offset-2 focus:outline-hidden sm:text-sm"
+					placeholder="seu@email.com"
+					class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-principal-5 focus:ring-2 focus:ring-principal-5/20 focus:outline-none transition-colors"
 				/>
 			</div>
 
-			{#if $signupErrors.email}<span class="mt-1 pl-2 text-sm font-bold text-red-500"
-					>{$signupErrors.email}</span
+			{#if $signupErrors.email}<span class="flex items-center gap-1 text-sm font-medium text-red-500" transition:fly={{ y: -10 }}>
+					<AlertCircle class="size-4" />
+					{$signupErrors.email}</span
 				>{/if}
 		</div>
 		<div class="flex flex-col items-start gap-1 py-4">
 			<Label.Root for="password" class="text-sm font-medium">Senha:</Label.Root>
 			<div class="flex w-full flex-col gap-4">
-				<input
-					bind:value={password}
-					type="password"
-					name="password"
-					class="bg-principal-1 placeholder:text-foreground-alt/50 inline-flex h-10 w-full items-center rounded-sm border border-zinc-300 px-4 text-base focus:ring-2 focus:ring-offset-2 focus:outline-hidden sm:text-sm"
-				/>
-				{#if $signupErrors.password}<span class="mt-1 pl-2 text-sm font-bold text-red-500"
-						>{$signupErrors.password}</span
-					>{/if}
-				<div class="flex w-[60%] flex-col">
-					<Meter.Root
-						aria-valuetext="password strength {strength}% - {stringPassword()}"
-						value={strength}
-						min={0}
-						max={100}
-						class="bg-dark-10 shadow-mini-inset relative h-[15px] overflow-hidden rounded-full"
+				<div class="relative w-full">
+					<input
+						id="password-signup"
+						bind:value={password}
+						type={showSignupPassword ? 'text' : 'password'}
+						name="password"
+						placeholder="••••••••"
+						class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 pr-10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-principal-5 focus:ring-2 focus:ring-principal-5/20 focus:outline-none transition-colors"
+					/>
+					<button
+						type="button"
+						onclick={() => (showSignupPassword = !showSignupPassword)}
+						class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
 					>
-						<div
-							class="shadow-mini-inset h-full w-full flex-1 rounded-full transition-all duration-1000 ease-in-out {colorMeter}"
-							style="transform: translateX(-{100 - (100 * (strength ?? 0)) / 100}%)"
-						></div>
-					</Meter.Root>
-					<span class="font-bold transition-all duration-1000 ease-in-out {colorName}"
-						>{stringPassword()}</span
-					>
+						{#if showSignupPassword}
+							<EyeOff class="size-5" />
+						{:else}
+							<Eye class="size-5" />
+						{/if}
+					</button>
 				</div>
+				{#if $signupErrors.password}<span class="flex items-center gap-1 text-sm font-medium text-red-500" transition:fly={{ y: -10 }}>
+						<AlertCircle class="size-4" />
+						{$signupErrors.password}</span
+					>{/if}
+					
+				{#if password.length > 0}
+					<div class="space-y-2 pt-2" transition:fly={{ y: -10 }}>
+						<Meter.Root
+							aria-valuetext="password strength {strength}% - {stringPassword()}"
+							value={strength}
+							min={0}
+							max={100}
+							class="relative h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
+						>
+							<div
+								class="h-full rounded-full transition-all duration-500 ease-out {colorMeter}"
+								style="width: {strength}%"
+							></div>
+						</Meter.Root>
+						<span class="text-sm font-medium transition-all duration-500 {colorName}">
+							{stringPassword()}
+						</span>
+					</div>
+				{/if}
 			</div>
 		</div>
-		<div class="flex w-full justify-center">
+		<div class="flex flex-col items-center gap-3 pt-2">
 			<button
-				class="bg-principal-5 hover:bg-principal-3 inline-flex h-10 items-center justify-center rounded-lg px-12 font-semibold text-black shadow-sm transition-colors duration-300 active:scale-[0.95]"
+				type="submit"
+				class="w-full bg-principal-5 hover:bg-principal-6 rounded-lg px-6 py-3 font-semibold text-white shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+				disabled={$delayedSignup}
 			>
-				Cadastrar
+				{#if $delayedSignup}
+					<Loading />
+				{:else}
+					Criar Conta
+				{/if}
 			</button>
+			
+			{#if $signupErrors._errors}
+				<div class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg w-full" transition:scale>
+					<AlertCircle class="size-5 text-red-500" />
+					<span class="text-sm font-medium text-red-700 dark:text-red-300">
+						{$signupErrors._errors}
+					</span>
+				</div>
+			{/if}
 		</div>
 	</form>
 {/snippet}
@@ -257,21 +520,21 @@
 		Login
 	</Dialog.Trigger>
 	<Dialog.Portal>
-		<Dialog.Overlay class="fixed inset-0 z-50 bg-black/80" />
+		<Dialog.Overlay class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
 		<Dialog.Content
-			class="bg-principal-1 fixed top-[50%] left-[50%] z-50 flex w-full max-w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] translate-x-[-50%] translate-y-[-50%] flex-col rounded-lg border shadow-sm outline-hidden sm:max-w-[490px] md:w-full"
+			class="bg-white dark:bg-gray-900 fixed top-[50%] left-[50%] z-50 flex w-full max-w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] translate-x-[-50%] translate-y-[-50%] flex-col rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl outline-hidden sm:max-w-[490px] md:w-full"
 		>
-			<div class="flex items-center justify-center border-b p-5">
-				<Dialog.Title class="text-2xl font-bold tracking-tight">
-					Login
+			<div class="flex items-center justify-center border-b border-gray-200 dark:border-gray-700 p-6">
+				<Dialog.Title class="text-2xl font-bold text-gray-900 dark:text-white">
+					{showForgotPassword ? 'Recuperar Senha' : 'Bem-vindo de volta!'}
 				</Dialog.Title>
 				<Dialog.Close
-					class="focus-visible:ring-foreground focus-visible:ring-offset-background absolute top-5 right-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
+					class="absolute top-5 right-5 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors focus-visible:ring-2 focus-visible:ring-principal-5 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.95]"
 				>
-					<X class="hover:text-principal-4 size-6 text-black" />
+					<X class="size-6" />
 				</Dialog.Close>
 			</div>
-			<div class="overflow-y-auto p-5">
+			<div class="overflow-y-auto p-6">
 				{@render login()}
 			</div>
 		</Dialog.Content>
@@ -285,23 +548,48 @@
 		Cadastro
 	</Dialog.Trigger>
 	<Dialog.Portal>
-		<Dialog.Overlay class="fixed inset-0 z-50 bg-black/80" />
+		<Dialog.Overlay class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
 		<Dialog.Content
-			class="bg-principal-1 fixed top-[50%] left-[50%] z-50 flex w-full max-w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] translate-x-[-50%] translate-y-[-50%] flex-col rounded-lg border shadow-sm outline-hidden sm:max-w-[490px] md:w-full"
+			class="bg-white dark:bg-gray-900 fixed top-[50%] left-[50%] z-50 flex w-full max-w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] translate-x-[-50%] translate-y-[-50%] flex-col rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl outline-hidden sm:max-w-[490px] md:w-full"
 		>
-			<div class="flex items-center justify-center border-b p-5">
-				<Dialog.Title class="text-2xl font-bold tracking-tight">
-					Cadastro
+			<div class="flex items-center justify-center border-b border-gray-200 dark:border-gray-700 p-6">
+				<Dialog.Title class="text-2xl font-bold text-gray-900 dark:text-white">
+					Criar Conta
 				</Dialog.Title>
 				<Dialog.Close
-					class="focus-visible:ring-foreground focus-visible:ring-offset-background absolute top-5 right-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
+					class="absolute top-5 right-5 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors focus-visible:ring-2 focus-visible:ring-principal-5 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.95]"
 				>
-					<X class="hover:text-principal-4 size-6 text-black" />
+					<X class="size-6" />
 				</Dialog.Close>
 			</div>
-			<div class="overflow-y-auto p-5">
+			<div class="overflow-y-auto p-6">
 				{@render cadastro()}
 			</div>
 		</Dialog.Content>
 	</Dialog.Portal>
 </Dialog.Root>
+
+<style>
+	@keyframes border-glow {
+		0% {
+			box-shadow: 
+				0 0 0 0 rgba(var(--principal-5-rgb, 99, 102, 241), 0.4),
+				0 0 8px 2px rgba(var(--principal-5-rgb, 99, 102, 241), 0.2);
+		}
+		50% {
+			box-shadow: 
+				0 0 0 3px rgba(var(--principal-5-rgb, 99, 102, 241), 0.2),
+				0 0 15px 4px rgba(var(--principal-5-rgb, 99, 102, 241), 0.4);
+		}
+		100% {
+			box-shadow: 
+				0 0 0 0 rgba(var(--principal-5-rgb, 99, 102, 241), 0.4),
+				0 0 8px 2px rgba(var(--principal-5-rgb, 99, 102, 241), 0.2);
+		}
+	}
+
+	.border-glow {
+		animation: border-glow 2s ease-in-out infinite;
+		border-radius: inherit;
+	}
+</style>

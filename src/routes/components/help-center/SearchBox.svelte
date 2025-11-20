@@ -30,7 +30,7 @@
 <div class="relative w-full">
 	<div class="relative flex items-center">
 		<Search
-			class="pointer-events-none absolute left-4 text-gray-400"
+			class="pointer-events-none absolute left-4 text-gray-400 dark:text-gray-500"
 			size={20}
 			aria-hidden="true"
 		/>
@@ -39,7 +39,7 @@
 			{value}
 			oninput={handleInput}
 			{placeholder}
-			class="w-full rounded-xl border-2 border-gray-200 bg-white py-3 pl-12 pr-12 font-medium text-gray-700 shadow-sm transition-all duration-200 placeholder:text-gray-400 focus:border-principal-4 focus:outline-none focus:ring-2 focus:ring-principal-4/20"
+			class="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 py-3 pl-12 pr-12 font-medium text-gray-700 dark:text-gray-100 shadow-sm transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-principal-4 focus:outline-none focus:ring-2 focus:ring-principal-4/20"
 			aria-label="Campo de busca"
 		/>
 		{#if value.length > 0}

@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { Copyright, HelpCircle } from '@lucide/svelte';
 	import { fade } from 'svelte/transition';
+	import { page } from '$app/stores';
 	import HelpCenter from './help-center/HelpCenter.svelte';
 
 	let showHelpCenter = $state(false);
+	let profile = $derived($page.data.profile);
 
 	const socialIcons =
 		'flex items-center justify-center size-12 bg-white p-1 rounded-xl shadow-sm pointer hover:shadow-principal-4 transition-all duration-150 ease-in';
@@ -106,13 +108,13 @@
 		tabindex="-1"
 	>
 		<div
-			class="relative max-h-[90vh] w-full max-w-7xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+			class="relative max-h-[90vh] w-full max-w-7xl overflow-y-auto rounded-2xl bg-white dark:bg-gray-800 shadow-2xl"
 			transition:fade={{ duration: 300, delay: 100 }}
 		>
 			<button
 				type="button"
 				onclick={toggleHelpCenter}
-				class="hover:bg-principal-4 sticky right-4 top-4 z-10 ml-auto mr-4 mt-4 flex rounded-full bg-gray-100 p-2 text-gray-600 transition-all duration-200 hover:text-white"
+				class="hover:bg-principal-4 sticky right-4 top-4 z-10 ml-auto mr-4 mt-4 flex rounded-full bg-gray-100 dark:bg-gray-700 p-2 text-gray-600 dark:text-gray-300 transition-all duration-200 hover:text-white"
 				aria-label="Fechar Central de Ajuda"
 			>
 				<svg
@@ -122,18 +124,20 @@
 					viewBox="0 0 24 24"
 					fill="none"
 					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
-				>
-			</button>
-			<HelpCenter />
-		</div>
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
+			>
+		</button>
+		<HelpCenter 
+			onClose={toggleHelpCenter} 
+			userEmail={profile?.email || ''} 
+			userName={profile?.name || ''} 
+		/>
 	</div>
-{/if}
-
-<style>
+</div>
+{/if}<style>
 	footer {
 		background: linear-gradient(0deg, rgb(230, 230, 230) 10%, rgba(255, 233, 180, 0) 100%);
 	}

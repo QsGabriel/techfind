@@ -25,10 +25,23 @@ const schemaSignup = z.object({
 	password: z.string().min(6, { message: 'Senha deve ter 6 caracteres no mínimo.' })
 });
 
+const schemaContact = z.object({
+	name: z.string().min(3, { message: 'Nome deve ter 3 caracteres no mínimo.' }),
+	email: z.string().email('Email inválido.'),
+	phone: z.string().optional(),
+	subject: z.string().min(5, { message: 'Assunto deve ter pelo menos 5 caracteres.' }),
+	message: z.string().min(10, { message: 'Mensagem deve ter pelo menos 10 caracteres.' })
+});
+
+const schemaResetPassword = z.object({
+	email: z.string().email('Email inválido.')
+});
+
 export const load: PageServerLoad = async () => {
 	const formLogin = await superValidate(zod(schemaLogin));
 	const formSignup = await superValidate(zod(schemaSignup));
-	return { formLogin, formSignup };
+	const formResetPassword = await superValidate(zod(schemaResetPassword));
+	return { formLogin, formSignup, formResetPassword };
 };
 
 export const actions: Actions = {
@@ -40,31 +53,60 @@ export const actions: Actions = {
 		}
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
-		const type = formData.get('radio') === 'Cliente' ? 1 : 2;
+		const type = formData.get('radio') === 'Prestador' ? 1 : 2; // 1 = Prestador, 2 = Cliente
 		const typePersonal = formData.get('typePersonal') as string;
 		const phone = formData.get('phone') as string;
 		const name = formData.get('name') as string;
 		const date = formData.get('date') as string;
 
-		const { data, error } = await supabase.auth.signUp({ email, password });
-		if (error) {
-			return setError(formSignup, 'não foi possivel realizar o cadastro... tente novamente');
-		} else {
-			const prof = await supabase.from('profile').insert([
-				{
-					id_auth: data.user?.id,
-					type: type,
-					name: name,
-					typePersonal: typePersonal,
-					phone: phone,
-					date: date
-				}
-			]);
-			if (prof.error) {
-				return setError(formSignup, 'não foi possivel realizar o cadastro... tente novamente');
+		// Criar usuário no Supabase Auth
+		const { data: authData, error: authError } = await supabase.auth.signUp({ 
+			email, 
+			password,
+			options: {
+				emailRedirectTo: `${request.url.split('?')[0]}`
 			}
-			redirect(303, '/');
+		});
+		
+		if (authError) {
+			console.error('Erro ao criar usuário:', authError);
+			return setError(formSignup, 'não foi possivel realizar o cadastro... tente novamente');
 		}
+		
+		if (!authData.user) {
+			return setError(formSignup, 'erro ao criar usuário');
+		}
+		
+		// Fazer login automaticamente após o cadastro
+		const { error: signInError } = await supabase.auth.signInWithPassword({ 
+			email, 
+			password 
+		});
+		
+		if (signInError) {
+			console.error('Erro ao fazer login após cadastro:', signInError);
+			return setError(formSignup, 'usuário criado, mas não foi possível fazer login automático');
+		}
+		
+		// Inserir perfil do usuário
+		const { error: profileError } = await supabase.from('profile').insert([
+			{
+				id_auth: authData.user.id,
+				type: type,
+				name: name,
+				typePersonal: typePersonal,
+				phone: phone,
+				date: date
+			}
+		]);
+		
+		if (profileError) {
+			console.error('Erro ao criar perfil:', profileError);
+			return setError(formSignup, 'não foi possivel criar o perfil... tente novamente');
+		}
+		
+		// Redirecionar para a área privada
+		redirect(303, '/pv');
 	},
 	login: async ({ request, locals: { supabase } }) => {
 		const formData = await request.formData();
@@ -81,6 +123,79 @@ export const actions: Actions = {
 			return setError(formLogin, 'email ou senha estão errados... tente novamente!');
 		} else {
 			redirect(303, '/pv');
+		}
+	},
+	sendContact: async ({ request, locals: { supabase, user } }) => {
+		const formData = await request.formData();
+		const formContact = await superValidate(formData, zod(schemaContact));
+		
+		if (!formContact.valid) {
+			return setError(formContact, 'Erro de validação. Verifique os campos.');
+		}
+
+		const name = formData.get('name') as string;
+		const email = formData.get('email') as string;
+		const phone = formData.get('phone') as string;
+		const subject = formData.get('subject') as string;
+		const message = formData.get('message') as string;
+
+		try {
+			// Inserir mensagem no banco de dados
+			const { error: dbError } = await supabase.from('contact_messages').insert([
+				{
+					id_user: user?.id || null,
+					name: name,
+					email: email,
+					phone: phone || null,
+					subject: subject,
+					message: message,
+					status: 'pendente'
+				}
+			]);
+
+			if (dbError) {
+				console.error('Erro ao salvar mensagem:', dbError);
+				return setError(formContact, 'Erro ao salvar mensagem. Tente novamente.');
+			}
+
+			// Aqui você pode adicionar a lógica de envio de email
+			// Por exemplo, usando um serviço como Resend, SendGrid, etc.
+			// await sendEmail({
+			//   to: 'suporte.techfind@outlook.com',
+			//   subject: `Contato: ${subject}`,
+			//   text: `Nome: ${name}\nEmail: ${email}\nTelefone: ${phone}\n\nMensagem:\n${message}`
+			// });
+
+			return { formContact, success: true };
+		} catch (error) {
+			console.error('Erro ao processar contato:', error);
+			return setError(formContact, 'Erro ao processar sua solicitação.');
+		}
+	},
+	resetPassword: async ({ request, locals: { supabase } }) => {
+		const formData = await request.formData();
+		const formResetPassword = await superValidate(formData, zod(schemaResetPassword));
+
+		if (!formResetPassword.valid) {
+			return setError(formResetPassword, 'Email inválido.');
+		}
+
+		const email = formData.get('email') as string;
+
+		try {
+			const { error } = await supabase.auth.resetPasswordForEmail(email, {
+				redirectTo: `${new URL(request.url).origin}/auth/reset-password`
+			});
+
+			if (error) {
+				console.error('Erro ao enviar email de recuperação:', error);
+				return setError(formResetPassword, 'Erro ao enviar email. Tente novamente.');
+			}
+
+			return { formResetPassword, success: true, message: 'Email de recuperação enviado! Verifique sua caixa de entrada.' };
+		} catch (error) {
+			console.error('Erro ao processar recuperação:', error);
+			return setError(formResetPassword, 'Erro ao processar sua solicitação.');
 		}
 	}
 };

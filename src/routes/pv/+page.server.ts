@@ -2,15 +2,36 @@ import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals: { supabase, user } }) => {
-	if (user) {
-		const { data: profile } = await supabase
-			.from('profile')
-			.select()
-			.eq('id_auth', user.id)
-			.single();
-		return { profile: profile };
+	// Proteção desativada para testes
+	// if (!user) {
+	// 	redirect(303, '/');
+	// }
+
+	const { data: profile, error } = await supabase
+		.from('profile')
+		.select('id, id_auth, name, type, typePersonal, phone, date, age, desc, caract, tags')
+		.eq('id_auth', user.id)
+		.single();
+	
+	if (error) {
+		console.error('Erro ao carregar perfil:', error);
+		console.error('User ID:', user.id);
+		console.error('Error code:', error.code);
+		console.error('Error details:', JSON.stringify(error, null, 2));
+		
+		// Se o erro for PGRST116, significa que não há registro
+		if (error.code === 'PGRST116') {
+			redirect(303, '/setup-perfil');
+		}
+		
+		throw new Error(`Erro ao carregar perfil: ${error.message}`);
 	}
-	return null;
+	
+	if (!profile) {
+		redirect(303, '/setup-perfil');
+	}
+	
+	return { profile };
 };
 
 export const actions: Actions = {

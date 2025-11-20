@@ -103,22 +103,27 @@
 		<div
 			transition:fade={{ duration: 300 }}
 			class="fixed top-0 left-0 z-50 flex h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-sm p-4"
-			aria-hidden="true"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="plano-title"
 			onclick={() => (planOpen = !planOpen)}
+			onkeydown={(e) => e.key === 'Escape' && (planOpen = false)}
 		>
 			<div 
 				class="plano-modal relative flex max-w-2xl w-full flex-col gap-6 rounded-2xl bg-white p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
+				role="document"
 				onclick={(e) => e.stopPropagation()}
 			>
 				<button 
 					class="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 hover:bg-principal-4 hover:text-white transition-all duration-300 text-2xl font-bold"
 					onclick={() => (planOpen = !planOpen)}
+					aria-label="Fechar modal"
 				>
 					&times;
 				</button>
 				
 				<div class="mt-2">
-					<h2 class="text-3xl font-bold text-principal-6 mb-2">{cards[indxPlan].title}</h2>
+					<h2 id="plano-title" class="text-3xl font-bold text-principal-6 mb-2">{cards[indxPlan].title}</h2>
 					<span class="text-lg font-semibold text-zinc-500 italic">{cards[indxPlan].subtitle}</span>
 				</div>
 
