@@ -119,4 +119,4 @@ Acesse: http://localhost:5173
 - [Documentação Supabase](https://supabase.com/docs)
 - [Guia de RLS](https://supabase.com/docs/guides/auth/row-level-security)
 - [Supabase CLI](https://supabase.com/docs/guides/cli)
-- [Projeto no GitHub](https://github.com/Erudhir101/Techfind)
+- [Projeto no GitHub](https://github.com/QsGabriel/techfind)

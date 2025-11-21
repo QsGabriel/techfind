@@ -143,9 +143,9 @@ Este projeto é de uso educacional e comercial.
 
 ## 👨‍💻 Autor
 
-**Erudhir101**
-- GitHub: [@Erudhir101](https://github.com/Erudhir101)
+**QSGabriel**
+- GitHub: [@QsGabriel](https://github.com/QsGabriel)
 
 ## 🆘 Suporte
 
-Encontrou um problema? Abra uma [issue](https://github.com/Erudhir101/Techfind/issues) no GitHub.
+Encontrou um problema? Abra uma [issue](https://github.com/QsGabriel/techfind) no GitHub.
