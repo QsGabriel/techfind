@@ -17,7 +17,7 @@
 	<!-- Back Button -->
 	<div class="p-4 lg:p-6">
 		<Button.Root
-			href="../"
+			href="/pv"
 			class="group inline-flex items-center gap-2 rounded-xl bg-white dark:bg-gray-800 px-4 py-2.5 shadow-lg ring-1 ring-gray-200 dark:ring-gray-700 transition-all duration-300 hover:shadow-xl hover:ring-principal-5 hover:-translate-x-1"
 		>
 			<ChevronLeft class="h-5 w-5 text-gray-600 dark:text-gray-300 transition-transform duration-300 group-hover:-translate-x-1" />

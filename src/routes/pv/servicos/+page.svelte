@@ -1,8 +1,9 @@
 <script>
-	import { Accordion, AlertDialog, Button, Dialog, Label } from 'bits-ui';
-	import { ChevronLeft, Plus, X, ChevronDown } from '@lucide/svelte';
+	import { Accordion, AlertDialog, Button, Dialog, Label, ScrollArea } from 'bits-ui';
+	import { ChevronLeft, Plus, X, ChevronDown, Briefcase, DollarSign, Sparkles } from '@lucide/svelte';
 	import { superForm } from 'sveltekit-superforms';
-	import { fly } from 'svelte/transition';
+	import { fly, fade } from 'svelte/transition';
+	import AccessibilityControls from '../../components/AccessibilityControls.svelte';
 
 	let { data } = $props();
 	const { errors } = superForm(data.form);
@@ -65,128 +66,165 @@
 	</form>
 {/snippet}
 
-<Button.Root
-	href="../"
-	class="bg-principal-1 hover:bg-principal-4 mt-4 ml-4 inline-block rounded-full border-2 border-black shadow hover:border-black/80"
->
-	<ChevronLeft class="size-10 stroke-1 hover:stroke-black/80" />
-</Button.Root>
+<!-- Background Gradient -->
+<div class="fixed inset-0 -z-10 bg-gradient-to-br from-principal-1 via-principal-2 to-principal-3 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"></div>
 
-<div class="mt-24 flex w-full flex-col items-center gap-4">
-	<h2 class="text-2xl font-bold">SERVIÇOS</h2>
+<!-- Accessibility Controls -->
+<AccessibilityControls />
 
-	<Dialog.Root>
-		<Dialog.Trigger
-			class="bg-principal-5 hover:bg-principal-3 mt-4 mb-16 inline-flex h-12 items-center justify-center gap-2 rounded-lg px-5 font-semibold whitespace-nowrap text-black shadow-sm transition-colors duration-300 active:scale-[0.95]"
+<div class="min-h-screen p-4 sm:p-6 lg:p-8">
+	<!-- Header with Back Button -->
+	<div class="mb-8">
+		<Button.Root
+			href="/pv"
+			class="group inline-flex items-center gap-2 rounded-xl bg-white/90 dark:bg-gray-800/90 px-4 py-2 backdrop-blur-sm transition-all hover:bg-white dark:hover:bg-gray-800 hover:shadow-lg border border-gray-200 dark:border-gray-700"
 		>
-			<Plus strokeWidth={3} /> Criar Serviço</Dialog.Trigger
-		>
-		<Dialog.Portal>
-			<Dialog.Overlay class="fixed inset-0 z-50 bg-black/80" />
-			<Dialog.Content
-				class="bg-principal-1 fixed top-[50%] left-[50%] z-50 flex w-full max-w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] translate-x-[-50%] translate-y-[-50%] flex-col rounded-lg border shadow-sm outline-hidden sm:max-w-[490px] md:w-full"
-			>
-				<div class="flex items-center justify-center border-b p-5">
-					<Dialog.Title class="text-2xl font-bold tracking-tight">
-						Criação de Serviço
-					</Dialog.Title>
-					<Dialog.Close
-						class="focus-visible:ring-foreground focus-visible:ring-offset-background absolute top-5 right-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
-					>
-						<X class="hover:text-principal-4 size-6 text-black" />
-					</Dialog.Close>
-				</div>
-				<div class="overflow-y-auto p-5">
-					{@render service()}
-				</div>
-			</Dialog.Content>
-		</Dialog.Portal>
-	</Dialog.Root>
+			<ChevronLeft class="size-5 transition-transform group-hover:-translate-x-1" />
+			<span class="font-medium">Voltar</span>
+		</Button.Root>
+	</div>
 
-	<Accordion.Root
-		orientation="vertical"
-		type="multiple"
-		class="flex w-full flex-col gap-4 sm:max-w-2/5"
-	>
-		{#each data.services as service}
-			<Accordion.Item
-				class="flex flex-col items-center gap-8 rounded-md border-2 border-black px-2 py-2 shadow sm:px-8 sm:py-4"
-			>
-				<Accordion.Header class="w-full">
-					<Accordion.Trigger
-						class="border-principal-5 flex w-full items-center justify-between gap-2 [&[data-state=open]>span>svg]:rotate-180"
-					>
-						<h3 class="border-principal-5 border-b-4 text-lg font-bold">
-							{service.titulo}
-						</h3>
-						<h4 class="font-semibold">
-							Criado em:
-							<span class="text-principal-6 font-semibold">
-								{new Date(service.criado_em).toLocaleString('pt-BR', {
-									day: '2-digit',
-									month: '2-digit',
-									year: 'numeric',
-									hour: '2-digit',
-									minute: '2-digit',
-									hour12: false // Use formato 24 horas
-								})}
-							</span>
-						</h4>
-						<span
-							class="hover:bg-principal-2 inline-flex size-8 items-center justify-center rounded-[7px]"
-						>
-							<ChevronDown class=" transition-transform duration-200 " />
-						</span>
-					</Accordion.Trigger>
-				</Accordion.Header>
-				<Accordion.Content class="flex w-full flex-col items-center justify-around gap-4">
-					<div class="text-md overflow-hidden text-justify">"{service.descricao}"</div>
-					<div class="flex items-center gap-2">
-						<p class="font-bold">PREÇO:</p>
-						<span class="bg-principal-5 rounded-md px-4 py-2 font-semibold"
-							>R$: {service.preco}</span
-						>
-					</div>
+	<!-- Hero Section -->
+	<div class="mb-12 text-center" in:fade={{ duration: 300 }}>
+		<div class="flex items-center justify-center gap-3 mb-4">
+			<div class="rounded-xl bg-gradient-to-br from-principal-5 to-principal-6 p-3 shadow-lg">
+				<Briefcase class="size-8 text-white" strokeWidth={2.5} />
+			</div>
+		</div>
+		<h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3">Meus Serviços</h1>
+		<p class="text-lg text-gray-600 dark:text-gray-400">Gerencie seus serviços oferecidos</p>
+	</div>
 
-					<div class="self-end">
-						<AlertDialog.Root>
-							<AlertDialog.Trigger
-								class="bg-principal-5 hover:bg-principal-3 rounded-md px-2 py-2 shadow transition-colors duration-300"
-								><X strokeWidth={3} /></AlertDialog.Trigger
+	<!-- Container -->
+	<div class="max-w-5xl mx-auto space-y-8">
+
+		<!-- Create Service Button -->
+		<div class="flex justify-center mb-8">
+			<Dialog.Root>
+				<Dialog.Trigger
+					class="group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-principal-5 to-principal-6 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:shadow-xl hover:scale-105 active:scale-95"
+				>
+					<Plus class="size-5" strokeWidth={2.5} />
+					<span>Criar Novo Serviço</span>
+				</Dialog.Trigger>
+				<Dialog.Portal>
+					<Dialog.Overlay class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
+					<Dialog.Content
+						class="fixed top-[50%] left-[50%] z-50 flex w-full max-w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] translate-x-[-50%] translate-y-[-50%] flex-col rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-2xl outline-hidden sm:max-w-[490px] md:w-full"
+					>
+						<div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6">
+							<Dialog.Title class="text-2xl font-bold text-gray-900 dark:text-white">
+								Novo Serviço
+							</Dialog.Title>
+							<Dialog.Close
+								class="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95"
 							>
-							<AlertDialog.Portal>
-								<AlertDialog.Overlay class="fixed inset-0 z-50 bg-black/40" />
-								<AlertDialog.Content
-									class="fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-white p-7 shadow outline-hidden sm:max-w-lg md:w-full overflow-y-auto"
+								<X class="size-5 text-gray-500 dark:text-gray-400" />
+							</Dialog.Close>
+						</div>
+						<div class="overflow-y-auto p-6">
+							{@render service()}
+						</div>
+					</Dialog.Content>
+				</Dialog.Portal>
+			</Dialog.Root>
+		</div>
+
+		<!-- Services List -->
+		<Accordion.Root
+			orientation="vertical"
+			type="multiple"
+			class="space-y-4"
+		>
+			{#each data.services as service}
+				<Accordion.Item
+					class="rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all overflow-hidden"
+				>
+					<Accordion.Header class="w-full">
+						<Accordion.Trigger
+							class="flex w-full items-center justify-between gap-4 p-6 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 [&[data-state=open]>span>svg]:rotate-180"
+						>
+							<div class="flex items-center gap-3 flex-1 min-w-0">
+								<div class="rounded-lg bg-gradient-to-br from-principal-5 to-principal-6 p-2 shadow">
+									<Briefcase class="size-5 text-white" />
+								</div>
+								<div class="flex-1 min-w-0">
+									<h3 class="text-lg font-bold text-gray-900 dark:text-white truncate">
+										{service.titulo}
+									</h3>
+									<p class="text-sm text-gray-500 dark:text-gray-400">
+										{new Date(service.criado_em).toLocaleString('pt-BR', {
+											day: '2-digit',
+											month: '2-digit',
+											year: 'numeric',
+											hour: '2-digit',
+											minute: '2-digit',
+											hour12: false
+										})}
+									</p>
+								</div>
+							</div>
+							<span class="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700">
+								<ChevronDown class="size-5 text-gray-500 dark:text-gray-400 transition-transform duration-200" />
+							</span>
+						</Accordion.Trigger>
+					</Accordion.Header>
+					<Accordion.Content class="px-6 pb-6 space-y-4">
+						<div class="rounded-lg bg-gray-50 dark:bg-gray-800/50 p-4 border border-gray-200 dark:border-gray-700">
+							<p class="text-gray-700 dark:text-gray-300 leading-relaxed">"{service.descricao}"</p>
+						</div>
+						<div class="flex items-center justify-between">
+							<div class="flex items-center gap-2">
+								<DollarSign class="size-5 text-principal-6" />
+								<span class="text-sm font-medium text-gray-600 dark:text-gray-400">Preço</span>
+							</div>
+							<span class="rounded-lg bg-gradient-to-r from-principal-5 to-principal-6 px-4 py-2 font-bold text-white shadow">
+								R$ {service.preco}
+							</span>
+						</div>
+
+						<div class="flex justify-end">
+							<AlertDialog.Root>
+								<AlertDialog.Trigger
+									class="inline-flex items-center gap-2 rounded-lg bg-red-500/90 hover:bg-red-600 px-4 py-2 font-medium text-white shadow transition-all hover:shadow-lg active:scale-95"
 								>
-									<AlertDialog.Title class="text-lg font-semibold tracking-tight uppercase"
-										>Deletar Serviço</AlertDialog.Title
+									<X class="size-4" />
+									<span>Deletar</span>
+								</AlertDialog.Trigger>
+								<AlertDialog.Portal>
+									<AlertDialog.Overlay class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
+									<AlertDialog.Content
+										class="fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6 shadow-2xl outline-hidden sm:max-w-lg md:w-full overflow-y-auto"
 									>
-									<AlertDialog.Description class="text-md font-semibold text-black/50"
-										>Tem certeza que deseja deletar esse serviço?</AlertDialog.Description
-									>
-									<form method="POST" action="?/deleteService">
-										<input type="hidden" name="servicoId" value={service.id} />
-										<div class="mt-4 flex w-full items-center justify-center gap-4">
-											<AlertDialog.Cancel
-												type="button"
-												class="inline-flex w-full items-center justify-center rounded-md bg-black/90 py-4 text-sm font-medium text-white shadow-sm transition-all hover:bg-black/50 active:scale-[0.98]"
-												>Cancelar</AlertDialog.Cancel
-											>
-											<AlertDialog.Action
-												type="submit"
-												value={service}
-												class="inline-flex w-full items-center justify-center rounded-md bg-red-600/80 py-4 text-sm font-medium shadow-sm transition-all hover:bg-red-600/50 active:scale-[0.98]"
-												>Confirmar</AlertDialog.Action
-											>
-										</div>
-									</form>
-								</AlertDialog.Content>
-							</AlertDialog.Portal>
-						</AlertDialog.Root>
-					</div>
-				</Accordion.Content>
-			</Accordion.Item>
-		{/each}
-	</Accordion.Root>
+										<AlertDialog.Title class="text-xl font-bold text-gray-900 dark:text-white"
+											>Deletar Serviço</AlertDialog.Title
+										>
+										<AlertDialog.Description class="text-gray-600 dark:text-gray-400"
+											>Tem certeza que deseja deletar esse serviço? Esta ação não pode ser desfeita.</AlertDialog.Description
+										>
+										<form method="POST" action="?/deleteService">
+											<input type="hidden" name="servicoId" value={service.id} />
+											<div class="mt-4 flex w-full items-center justify-center gap-3">
+												<AlertDialog.Cancel
+													type="button"
+													class="inline-flex w-full items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700 py-3 px-4 font-medium text-gray-900 dark:text-white shadow transition-all hover:bg-gray-300 dark:hover:bg-gray-600 active:scale-95"
+													>Cancelar</AlertDialog.Cancel
+												>
+												<AlertDialog.Action
+													type="submit"
+													value={service}
+													class="inline-flex w-full items-center justify-center rounded-lg bg-red-600 hover:bg-red-700 py-3 px-4 font-medium text-white shadow transition-all active:scale-95"
+													>Confirmar</AlertDialog.Action
+												>
+											</div>
+										</form>
+									</AlertDialog.Content>
+								</AlertDialog.Portal>
+							</AlertDialog.Root>
+						</div>
+					</Accordion.Content>
+				</Accordion.Item>
+			{/each}
+		</Accordion.Root>
+	</div>
 </div>

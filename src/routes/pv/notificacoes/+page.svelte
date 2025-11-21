@@ -9,10 +9,11 @@
 </script>
 
 <Button.Root
-	href="../"
-	class="bg-principal-1 hover:bg-principal-4 mt-4 ml-4 inline-block rounded-full border-2 border-black shadow hover:border-black/80"
+	href="/pv"
+	class="group inline-flex items-center gap-2 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-4 py-2 transition-all hover:bg-white dark:hover:bg-gray-800 hover:shadow-lg border border-gray-200 dark:border-gray-700 mt-4 ml-4"
 >
-	<ChevronLeft class="size-10 stroke-1 hover:stroke-black/80" />
+	<ChevronLeft class="size-5 transition-transform group-hover:-translate-x-1" />
+	<span class="font-medium">Voltar</span>
 </Button.Root>
 
 <div class="mt-16 flex w-full flex-col items-center justify-center gap-8">
