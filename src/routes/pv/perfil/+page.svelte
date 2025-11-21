@@ -37,7 +37,7 @@
 				<input
 					type="text"
 					name="descricao"
-					value={profile?.desc}
+					value={profile?.description}
 					class="bg-principal-1 placeholder:text-foreground-alt/50 inline-flex h-10 w-full items-center rounded-sm border border-zinc-300 px-4 text-base focus:ring-2 focus:ring-offset-2 focus:outline-hidden sm:text-sm"
 				/>
 			</div>

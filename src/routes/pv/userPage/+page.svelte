@@ -28,7 +28,7 @@
 	let provider = {
 		name: data?.usuario?.name || 'Nome desconhecido',
 		title: data?.usuario?.caract || 'Título desconhecido',
-		description: data?.usuario?.desc || 'Descrição não fornecida',
+		description: data?.usuario?.description || 'Descrição não fornecida',
 		expertise: data?.usuario?.tags?.split('-') || [],
 		completedProjects: 156,
 		activeContracts: 12,

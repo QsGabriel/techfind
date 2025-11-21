@@ -160,14 +160,14 @@
 						>{/if}
 				</div>
 				<div class={div}>
-					<Label.Root for="desc" class={label}>Área de Descrição:</Label.Root>
+					<Label.Root for="description" class={label}>Área de Descrição:</Label.Root>
 					<textarea
-						name="desc"
+						name="description"
 						placeholder="Descreva o seu projeto..."
 						class="bg-principal-1 focus:outline-hnameden inline-flex h-20 w-full items-center rounded-sm border border-zinc-500 px-4 text-sm focus:ring-2 focus:ring-offset-2 sm:text-lg"
 					>
 					</textarea>
-					{#if $errors.desc}<span class="mt-1 pl-2 font-bold text-red-500">{$errors.desc}</span
+					{#if $errors.description}<span class="mt-1 pl-2 font-bold text-red-500">{$errors.description}</span
 						>{/if}
 				</div>
 				<Button.Root

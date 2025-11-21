@@ -82,20 +82,19 @@
 		</fieldset>
 			</div>			<!-- CPF/CNPJ -->
 			<div>
-				<label for="typePersonal" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+				<label for="typepersonal" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 					CPF ou CNPJ (apenas números)
 				</label>
 				<input
 					type="text"
-					id="typePersonal"
-					name="typePersonal"
-					bind:value={$form.typePersonal}
+					id="typepersonal"
+					name="typepersonal"
 					placeholder="00000000000"
 					class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white shadow-sm focus:border-principal-5 focus:outline-none focus:ring-1 focus:ring-principal-5"
 					required
 				/>
-				{#if $errors.typePersonal}
-					<p class="mt-1 text-xs text-red-600 dark:text-red-400">{$errors.typePersonal}</p>
+				{#if $errors.typepersonal}
+					<p class="mt-1 text-xs text-red-600 dark:text-red-400">{$errors.typepersonal}</p>
 				{/if}
 			</div>
 

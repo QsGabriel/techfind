@@ -55,6 +55,7 @@
 	// let placeholdCPF = $derived(isCPF === 'CPF' ? '000.000.000-00' : '00.000.000/0000-00');
 
 	let password = $state('');
+	let cpfCnpjValue = $state('');
 	let strength = $derived(checkPasswordStrength() * 100);
 
 	const colorName = $derived.by(() => {
@@ -123,6 +124,7 @@
 	function handleCPFCNPJInput(e: Event) {
 		const input = e.target as HTMLInputElement;
 		input.value = maskCPFCNPJ(input.value);
+		cpfCnpjValue = input.value.replace(/\D/g, '');
 	}
 
 	$effect(() => {
@@ -386,21 +388,21 @@
 		</div>
 
 		<div class="flex flex-col items-start gap-1 py-4">
-			<Label.Root for="typePersonal" class="text-sm font-medium">CPF / CNPJ:</Label.Root>
+			<Label.Root for="typepersonal" class="text-sm font-medium">CPF / CNPJ:</Label.Root>
 			<div class="w-full">
 				<input
-					id="typePersonal"
+					id="typepersonal"
 					type="text"
 					placeholder={isClient === 'Cliente' ? '000.000.000-00' : '00.000.000/0000-00'}
-					name="typePersonal"
 					oninput={handleCPFCNPJInput}
 					class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-principal-5 focus:ring-2 focus:ring-principal-5/20 focus:outline-none transition-colors"
 				/>
+				<input type="hidden" name="typepersonal" value={cpfCnpjValue} />
 			</div>
 
-			{#if $signupErrors.typePersonal}<span class="flex items-center gap-1 text-sm font-medium text-red-500" transition:fly={{ y: -10 }}>
+			{#if $signupErrors.typepersonal}<span class="flex items-center gap-1 text-sm font-medium text-red-500" transition:fly={{ y: -10 }}>
 					<AlertCircle class="size-4" />
-					{$signupErrors.typePersonal}</span
+					{$signupErrors.typepersonal}</span
 				>{/if}
 		</div>
 		<div class="flex flex-col items-start gap-1 py-4">

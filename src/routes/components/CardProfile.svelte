@@ -34,7 +34,7 @@
 						{new Date(usuario.date).toLocaleDateString('pt-BR')}
 					</p>
 				</div>
-				<p class="rounded-lg bg-zinc-200 p-2 text-justify">"{usuario.desc}"</p>
+				<p class="rounded-lg bg-zinc-200 p-2 text-justify">"{usuario.description}"</p>
 				<Dialog.Close
 					class="focus-visible:ring-foreground focus-visible:ring-offset-background absolute top-5 right-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98] z-20"
 				>

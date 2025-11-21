@@ -10,7 +10,7 @@ const schemaSetup = z.object({
 		.date({ message: 'Selecione uma data válida.' })
 		.refine((data) => new Date(data).setHours(0, 0, 0, 0) <= new Date().setHours(0, 0, 0, 0)),
 	radio: z.enum(['Cliente', 'Prestador']),
-	typePersonal: z
+	typepersonal: z
 		.string()
 		.regex(/^\d+$/, { message: 'Deve ter apenas números.' })
 		.min(11, { message: 'Deve ter pelo menos 11 dígitos.' })
@@ -61,7 +61,7 @@ export const actions: Actions = {
 		}
 
 		const type = formData.get('radio') === 'Prestador' ? 1 : 2; // 1 = Prestador, 2 = Cliente
-		const typePersonal = formData.get('typePersonal') as string;
+		const typepersonal = formData.get('typepersonal') as string;
 		const phone = formData.get('phone') as string;
 		const name = formData.get('name') as string;
 		const date = formData.get('date') as string;
@@ -72,7 +72,7 @@ export const actions: Actions = {
 				id_auth: user.id,
 				type: type,
 				name: name,
-				typePersonal: typePersonal,
+				typepersonal: typepersonal,
 				phone: phone,
 				date: date
 			}

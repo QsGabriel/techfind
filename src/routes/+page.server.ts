@@ -15,7 +15,7 @@ const schemaSignup = z.object({
 		.date({ message: 'Selecione uma data que tenha disponibilidade.' })
 		.refine((data) => new Date(data).setHours(0, 0, 0, 0) <= new Date().setHours(0, 0, 0, 0)),
 	radio: z.enum(['Cliente', 'Prestador']),
-	typePersonal: z
+	typepersonal: z
 		.string()
 		.regex(/^\d+$/, { message: 'Deve ter apenas os números.' })
 		.min(11, { message: 'Deve ter mais de 11 digitos.' })
@@ -54,7 +54,7 @@ export const actions: Actions = {
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
 		const type = formData.get('radio') === 'Prestador' ? 1 : 2; // 1 = Prestador, 2 = Cliente
-		const typePersonal = formData.get('typePersonal') as string;
+		const typepersonal = formData.get('typepersonal') as string;
 		const phone = formData.get('phone') as string;
 		const name = formData.get('name') as string;
 		const date = formData.get('date') as string;
@@ -88,22 +88,34 @@ export const actions: Actions = {
 			return setError(formSignup, 'usuário criado, mas não foi possível fazer login automático');
 		}
 		
+		console.log('Dados para inserir no profile:', {
+			id_auth: authData.user.id,
+			type: type,
+			name: name,
+			typepersonal: typepersonal,
+			phone: phone,
+			date: date
+		});
+		
 		// Inserir perfil do usuário
-		const { error: profileError } = await supabase.from('profile').insert([
+		const { data: profileData, error: profileError } = await supabase.from('profile').insert([
 			{
 				id_auth: authData.user.id,
 				type: type,
 				name: name,
-				typePersonal: typePersonal,
+				typepersonal: typepersonal,
 				phone: phone,
 				date: date
 			}
-		]);
+		]).select();
 		
 		if (profileError) {
 			console.error('Erro ao criar perfil:', profileError);
+			console.error('Detalhes do erro:', JSON.stringify(profileError, null, 2));
 			return setError(formSignup, 'não foi possivel criar o perfil... tente novamente');
 		}
+		
+		console.log('Perfil criado com sucesso:', profileData);
 		
 		// Redirecionar para a área privada
 		redirect(303, '/pv');

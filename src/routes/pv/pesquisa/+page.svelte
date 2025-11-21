@@ -1,266 +1,335 @@
 <script lang="ts">
 	import { Button, ScrollArea } from 'bits-ui';
 	import { marked } from 'marked';
-	// import teste from './teste.md';
-	// import { chatHistory, addMessage } from '$lib/stores/chatStore';
-	// import { useChat } from '@ai-sdk/svelte';
-	// import type { Message } from 'ai';
-	// import type { ActionData } from './$types';
 	import CardProfile from '../../components/CardProfile.svelte';
 	import CardPesquisa from '../../components/CardPesquisa.svelte';
-	import { ChevronLeft } from '@lucide/svelte';
+	import AccessibilityControls from '../../components/AccessibilityControls.svelte';
+	import { ChevronLeft, Sparkles, Users, Search } from '@lucide/svelte';
+	import { fly, fade } from 'svelte/transition';
 
 	let { data } = $props();
 	let api = JSON.parse(data.api);
 
-	const markdown = api.desc ? marked.parse(api.desc) : '';
-
-	// const { messages } = useChat({
-	// 	initialInput: text,
-	// 	initialMessages: $chatHistory,
-	// 	onFinish: (message: Message) => {
-	// 		addMessage(message);
-	// 	}
-	// });
-
-	// async function handleUserSubmit(event: Event) {
-	// 	event.preventDefault();
-	// 	if ($input.trim() === '') return;
-	// 	addMessage({ id: crypto.randomUUID(), role: 'user', content: $input });
-	// 	try {
-	// 		handleSubmit(event);
-	// 	} catch (err) {
-	// 		console.error('Error sending message:', err);
-	// 	}
-	// }
-
-	// $effect(() => console.log(api));
+	const markdown = api.description ? marked.parse(api.description) : '';
 </script>
 
-<div class="flex h-full w-full flex-col items-start justify-start gap-4 lg:h-svh">
-	<Button.Root
-		href="../"
-		class="bg-principal-1 hover:bg-principal-4 mt-4 ml-4 inline-block rounded-full border-2 border-black shadow hover:border-black/80"
-	>
-		<ChevronLeft class="size-10 stroke-1 hover:stroke-black/80" />
-	</Button.Root>
-
-	<div class="flex h-1/3 w-full flex-1 flex-col justify-center gap-8 p-4 pt-0 lg:flex-row">
-		<main
-			class="border-principal-4 flex basis-1/2 flex-col justify-between gap-8 rounded-xl border-2 px-8 py-8 shadow-xl {markdown
-				? 'h-full'
-				: 'h-1/2'}"
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-principal-1/10 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+	<!-- Back Button -->
+	<div class="p-4 lg:p-6">
+		<Button.Root
+			href="../"
+			class="group inline-flex items-center gap-2 rounded-xl bg-white dark:bg-gray-800 px-4 py-2.5 shadow-lg ring-1 ring-gray-200 dark:ring-gray-700 transition-all duration-300 hover:shadow-xl hover:ring-principal-5 hover:-translate-x-1"
 		>
-			<h1 class="text-center text-3xl font-bold">Resposta da IA</h1>
-			<ScrollArea.Root class="overflow-hidden rounded-md bg-white/80 p-4 text-justify">
-				<ScrollArea.Viewport class="h-full">
-					{#if markdown}
-						<div id="markdown">
-							{@html marked.parse(markdown)}
-						</div>
-					{:else}
-						<h2 class="text-principal-5 text-center text-2xl font-bold">
-							Nenhuma Pesquisa Realizada
-						</h2>
-						<h3 class="text-principal-4 text-center text-xl font-bold">
-							Faça uma pesquisa no botão embaixo!!
-						</h3>
-					{/if}
-				</ScrollArea.Viewport>
-				<ScrollArea.Scrollbar
-					orientation="vertical"
-					class="bg-principal-2 hover:bg-principal-6 my-1 hidden w-3 touch-none rounded-full border-l border-l-transparent p-px transition-all duration-200 select-none hover:w-3 lg:flex"
+			<ChevronLeft class="h-5 w-5 text-gray-600 dark:text-gray-300 transition-transform duration-300 group-hover:-translate-x-1" />
+			<span class="font-semibold text-gray-700 dark:text-gray-200">Voltar</span>
+		</Button.Root>
+	</div>
+
+	<!-- Main Content -->
+	<div class="mx-auto max-w-7xl px-4 pb-8 lg:px-6">
+		<div class="grid gap-6 lg:grid-cols-2 lg:gap-8">
+			<!-- AI Response Section -->
+			<div 
+				class="flex flex-col gap-6"
+				transition:fly={{ x: -20, duration: 600 }}
+			>
+				<!-- Header -->
+				<div class="flex items-center gap-3">
+					<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-principal-5 to-principal-6 shadow-lg">
+						<Sparkles class="h-6 w-6 text-white" />
+					</div>
+					<h1 class="text-2xl font-bold text-gray-900 dark:text-white lg:text-3xl">
+						Análise da IA
+					</h1>
+				</div>
+
+				<!-- Response Card -->
+				<div class="flex flex-col gap-6 rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-xl ring-1 ring-gray-200 dark:ring-gray-700 lg:p-8">
+					<ScrollArea.Root class="overflow-hidden rounded-xl bg-gray-50 dark:bg-gray-900/50 p-6">
+						<ScrollArea.Viewport class="max-h-[400px] lg:max-h-[500px]">
+							{#if markdown}
+								<div 
+									id="markdown" 
+									class="prose prose-sm dark:prose-invert max-w-none"
+									transition:fade={{ duration: 300 }}
+								>
+									{@html marked.parse(markdown)}
+								</div>
+							{:else}
+								<div class="flex flex-col items-center justify-center py-16 text-center">
+									<div class="mb-4 rounded-full bg-principal-5/10 dark:bg-principal-5/20 p-6">
+										<Search class="h-12 w-12 text-principal-5" />
+									</div>
+									<h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+										Nenhuma Pesquisa Realizada
+									</h2>
+									<p class="text-gray-600 dark:text-gray-400">
+										Preencha o formulário abaixo para começar sua busca
+									</p>
+								</div>
+							{/if}
+						</ScrollArea.Viewport>
+						<ScrollArea.Scrollbar
+							orientation="vertical"
+							class="my-1 w-2.5 touch-none rounded-full bg-gray-200 dark:bg-gray-700 p-px transition-all duration-200 hover:w-3 hover:bg-principal-4 dark:hover:bg-principal-5"
+						>
+							<ScrollArea.Thumb class="flex-1 rounded-full bg-principal-5 dark:bg-principal-4" />
+						</ScrollArea.Scrollbar>
+						<ScrollArea.Corner />
+					</ScrollArea.Root>
+
+					<!-- Search Form -->
+					<div>
+						<CardPesquisa />
+					</div>
+				</div>
+			</div>
+
+			<!-- Results Section -->
+			{#if markdown}
+				<div 
+					class="flex flex-col gap-6"
+					transition:fly={{ x: 20, duration: 600, delay: 200 }}
 				>
-					<ScrollArea.Thumb class="bg-principal-4 flex-1 rounded-full" />
-				</ScrollArea.Scrollbar>
-				<ScrollArea.Corner />
-			</ScrollArea.Root>
-			<CardPesquisa />
-		</main>
-		{#if markdown}
-			<CardProfile usuarios={api.usuarios}></CardProfile>
-		{/if}
+					<!-- Header -->
+					<div class="flex items-center gap-3">
+						<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-principal-5 to-principal-6 shadow-lg">
+							<Users class="h-6 w-6 text-white" />
+						</div>
+						<h2 class="text-2xl font-bold text-gray-900 dark:text-white lg:text-3xl">
+							Profissionais Encontrados
+						</h2>
+					</div>
+
+					<!-- Results Card -->
+					<div class="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-xl ring-1 ring-gray-200 dark:ring-gray-700 lg:p-8">
+						<CardProfile usuarios={api.usuarios} />
+					</div>
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>
 
+<!-- Accessibility Controls -->
+<AccessibilityControls />
+
 <style>
-	#markdown :global {
-		code {
-			/* color: color-mix(in oklab, var(--color-black) 90%, transparent); */
-			font-weight: 500;
-			background-color: var(--color-zinc-400);
-			padding: 5px;
-			border-radius: 15px;
-		}
+	/* Markdown Styling with Tailwind-compatible custom properties */
+	#markdown :global(h1) {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: rgb(17 24 39);
+		margin-bottom: 1rem;
+		margin-top: 1.5rem;
+	}
 
-		/* Headings */
-		h1 {
-			font-size: 1.5rem;
-			margin: 1.5rem 0;
-		}
+	:global(.dark) #markdown :global(h1) {
+		color: rgb(255 255 255);
+	}
 
-		h2 {
-			font-size: 2rem;
-			margin: 1.8rem 0 1.2rem;
-			color: #444;
-		}
+	#markdown :global(h2) {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: rgb(31 41 55);
+		margin-bottom: 0.75rem;
+		margin-top: 1.25rem;
+	}
 
-		h3 {
-			font-size: 1.75rem;
-			margin: 1.5rem 0 1rem;
-		}
+	:global(.dark) #markdown :global(h2) {
+		color: rgb(243 244 246);
+	}
 
-		h4 {
-			font-size: 1.5rem;
-			margin: 1.2rem 0 0.8rem;
-		}
+	#markdown :global(h3) {
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: rgb(31 41 55);
+		margin-bottom: 0.5rem;
+		margin-top: 1rem;
+	}
 
-		h5 {
-			font-size: 1.25rem;
-			margin: 1rem 0 0.6rem;
-		}
+	:global(.dark) #markdown :global(h3) {
+		color: rgb(229 231 235);
+	}
 
-		h6 {
-			font-size: 1rem;
-			margin: 0.8rem 0 0.5rem;
-			color: #666;
-		}
+	#markdown :global(h4) {
+		font-size: 1rem;
+		font-weight: 600;
+		color: rgb(55 65 81);
+		margin-bottom: 0.5rem;
+		margin-top: 0.75rem;
+	}
 
-		/* Paragraphs */
-		p {
-			margin-bottom: 1.2rem;
-			hyphens: auto;
-		}
+	:global(.dark) #markdown :global(h4) {
+		color: rgb(209 213 219);
+	}
 
-		/* Lists */
-		ul,
-		ol {
-			margin: 1rem 0;
-			padding-left: 2rem;
-		}
+	#markdown :global(p) {
+		color: rgb(55 65 81);
+		margin-bottom: 1rem;
+		line-height: 1.625;
+	}
 
-		li {
-			margin: 0.2rem 0;
-			padding-left: 0.2rem;
-			list-style-type: disc;
-		}
+	:global(.dark) #markdown :global(p) {
+		color: rgb(209 213 219);
+	}
 
-		ul ul,
-		ol ol {
-			margin: 0.2rem 0;
-		}
+	#markdown :global(ul),
+	#markdown :global(ol) {
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		padding-left: 1.5rem;
+	}
 
-		li > p {
-			margin: 0.2rem 0;
-		}
+	#markdown :global(ul) {
+		list-style-type: disc;
+	}
 
-		/* Code Blocks */
-		pre {
-			background: #f8f9fa;
-			padding: 1.5rem;
-			border-radius: 6px;
-			overflow-x: auto;
-			margin: 1.5rem 0;
-			font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-		}
+	#markdown :global(ol) {
+		list-style-type: decimal;
+	}
 
-		code {
-			background: #f3f3f3;
-			padding: 0.2em 0.4em;
-			border-radius: 3px;
-			font-size: 0.9em;
-		}
+	#markdown :global(li) {
+		color: rgb(55 65 81);
+		margin-top: 0.5rem;
+		margin-bottom: 0.5rem;
+	}
 
-		pre code {
-			background: none;
-			padding: 0;
-			font-size: 0.9em;
-		}
+	:global(.dark) #markdown :global(li) {
+		color: rgb(209 213 219);
+	}
 
-		/* Blockquotes */
-		blockquote {
-			border-left: 4px solid #ddd;
-			margin: 1.5rem 0;
-			padding: 0.5rem 1.5rem;
-			color: #666;
-			background-color: #f9f9f9;
-		}
+	#markdown :global(code) {
+		background-color: rgba(99, 102, 241, 0.1);
+		color: rgb(79, 70, 229);
+		padding: 0.125rem 0.375rem;
+		border-radius: 0.25rem;
+		font-family: ui-monospace, monospace;
+		font-size: 0.875rem;
+	}
 
-		blockquote p {
-			margin: 0.5rem 0;
-		}
+	:global(.dark) #markdown :global(code) {
+		background-color: rgba(99, 102, 241, 0.2);
+		color: rgb(165, 180, 252);
+	}
 
-		/* Tables */
-		table {
-			width: 100%;
-			border-collapse: collapse;
-			margin: 1.5rem 0;
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-		}
+	#markdown :global(pre) {
+		background-color: rgb(31 41 55);
+		padding: 1rem;
+		border-radius: 0.75rem;
+		overflow-x: auto;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+	}
 
-		th,
-		td {
-			padding: 0.75rem;
-			text-align: left;
-			border-bottom: 1px solid #ddd;
-		}
+	:global(.dark) #markdown :global(pre) {
+		background-color: rgb(3 7 18);
+	}
 
-		th {
-			background-color: #f8f9fa;
-			font-weight: 600;
-		}
+	#markdown :global(pre code) {
+		background-color: transparent;
+		color: rgb(243 244 246);
+		padding: 0;
+	}
 
-		tr:hover {
-			background-color: #f5f5f5;
-		}
+	#markdown :global(blockquote) {
+		border-left-width: 4px;
+		border-color: rgb(99 102 241);
+		padding-left: 1rem;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		color: rgb(107 114 128);
+		font-style: italic;
+	}
 
-		/* Links */
-		a {
-			color: #0366d6;
-			text-decoration: none;
-			transition: color 0.2s ease;
-		}
+	:global(.dark) #markdown :global(blockquote) {
+		color: rgb(156 163 175);
+	}
 
-		a:hover {
-			color: #033d7d;
-			text-decoration: underline;
-		}
+	#markdown :global(a) {
+		color: rgb(79 70 229);
+		text-decoration: underline;
+		transition: color 0.2s;
+	}
 
-		/* Images */
-		img {
-			max-width: 100%;
-			height: auto;
-			margin: 1.5rem 0;
-			border-radius: 4px;
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-		}
+	#markdown :global(a:hover) {
+		color: rgb(99 102 241);
+	}
 
-		/* Horizontal Rules */
-		hr {
-			border: 0;
-			height: 1px;
-			background: #ddd;
-			margin: 2rem 0;
-		}
+	:global(.dark) #markdown :global(a) {
+		color: rgb(129 140 248);
+	}
 
-		/* Additional Enhancements */
-		kbd {
-			background: #fafbfc;
-			border: 1px solid #d1d5da;
-			border-radius: 3px;
-			box-shadow: inset 0 -1px 0 #d1d5da;
-			color: #444;
-			display: inline-block;
-			font-family: monospace;
-			padding: 3px 5px;
-		}
+	:global(.dark) #markdown :global(a:hover) {
+		color: rgb(165 180 252);
+	}
 
-		.footnotes {
-			font-size: 0.9em;
-			color: #666;
-			border-top: 1px solid #eee;
-			margin-top: 2rem;
-			padding-top: 1rem;
-		}
+	#markdown :global(strong) {
+		font-weight: 700;
+		color: rgb(17 24 39);
+	}
+
+	:global(.dark) #markdown :global(strong) {
+		color: rgb(255 255 255);
+	}
+
+	#markdown :global(em) {
+		font-style: italic;
+	}
+
+	#markdown :global(hr) {
+		margin-top: 1.5rem;
+		margin-bottom: 1.5rem;
+		border-color: rgb(209 213 219);
+	}
+
+	:global(.dark) #markdown :global(hr) {
+		border-color: rgb(75 85 99);
+	}
+
+	#markdown :global(table) {
+		width: 100%;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		border-collapse: collapse;
+	}
+
+	#markdown :global(th),
+	#markdown :global(td) {
+		border: 1px solid rgb(209 213 219);
+		padding: 0.5rem 1rem;
+	}
+
+	:global(.dark) #markdown :global(th),
+	:global(.dark) #markdown :global(td) {
+		border-color: rgb(75 85 99);
+	}
+
+	#markdown :global(th) {
+		background-color: rgb(243 244 246);
+		font-weight: 600;
+		color: rgb(17 24 39);
+	}
+
+	:global(.dark) #markdown :global(th) {
+		background-color: rgb(55 65 81);
+		color: rgb(255 255 255);
+	}
+
+	#markdown :global(td) {
+		color: rgb(55 65 81);
+	}
+
+	:global(.dark) #markdown :global(td) {
+		color: rgb(209 213 219);
+	}
+
+	#markdown :global(img) {
+		max-width: 100%;
+		height: auto;
+		border-radius: 0.5rem;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 	}
 </style>

@@ -15,7 +15,7 @@
 
 -- Exemplo 1: Inserir perfil de prestador
 /*
-INSERT INTO public.profile (id_auth, name, type, typePersonal, phone, date, desc, caract, tags)
+INSERT INTO public.profile (id_auth, name, type, typepersonal, phone, date, description, caract, tags)
 VALUES (
     'uuid-do-usuario-1', -- Substituir pelo UUID real do auth.users
     'João Silva',
@@ -31,7 +31,7 @@ VALUES (
 
 -- Exemplo 2: Inserir perfil de cliente
 /*
-INSERT INTO public.profile (id_auth, name, type, typePersonal, phone, date, desc, caract, tags)
+INSERT INTO public.profile (id_auth, name, type, typepersonal, phone, date, description, caract, tags)
 VALUES (
     'uuid-do-usuario-2', -- Substituir pelo UUID real do auth.users
     'Maria Santos',

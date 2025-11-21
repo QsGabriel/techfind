@@ -17,11 +17,11 @@ CREATE TABLE IF NOT EXISTS public.profile (
     id_auth UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     type SMALLINT NOT NULL CHECK (type IN (1, 2)), -- 1: Prestador, 2: Cliente
-    typePersonal VARCHAR(14) NOT NULL, -- CPF (11) ou CNPJ (14)
+    typepersonal VARCHAR(14) NOT NULL, -- CPF (11) ou CNPJ (14)
     phone VARCHAR(20) NOT NULL,
     date DATE NOT NULL, -- Data de nascimento ou fundação
     age INTEGER, -- Idade calculada
-    desc TEXT, -- Descrição do perfil
+    description TEXT, -- Descrição do perfil
     caract TEXT, -- Características profissionais
     tags TEXT, -- Tags separadas por hífen (ex: "frontend-backend-fullstack")
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -37,7 +37,7 @@ CREATE INDEX idx_profile_tags ON public.profile USING gin(to_tsvector('portugues
 -- Comentários
 COMMENT ON TABLE public.profile IS 'Perfis de usuários do sistema';
 COMMENT ON COLUMN public.profile.type IS '1 = Prestador de serviço, 2 = Cliente';
-COMMENT ON COLUMN public.profile.typePersonal IS 'CPF (11 dígitos) ou CNPJ (14 dígitos)';
+COMMENT ON COLUMN public.profile.typepersonal IS 'CPF (11 dígitos) ou CNPJ (14 dígitos)';
 
 -- =====================================================
 -- TABELA: services
